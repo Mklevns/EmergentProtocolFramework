@@ -3,15 +3,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { TrainingStatus } from '@/lib/agent-types';
-import { Play, Pause, Square, RotateCcw, Settings } from 'lucide-react';
+import { Play, Pause, Square, RotateCcw, Settings, Brain, Activity, Zap } from 'lucide-react';
 
 interface TrainingControlsProps {
-  experimentId: number;
+  experimentId: number | null;
   trainingStatus: TrainingStatus | undefined;
   onStart: () => void;
   onStop: () => void;
+  onQuickStart: () => void;
   isStarting: boolean;
   isStopping: boolean;
+  realtimeMetrics?: any;
 }
 
 export function TrainingControls({
@@ -19,8 +21,10 @@ export function TrainingControls({
   trainingStatus,
   onStart,
   onStop,
+  onQuickStart,
   isStarting,
-  isStopping
+  isStopping,
+  realtimeMetrics
 }: TrainingControlsProps) {
   const isRunning = trainingStatus?.isRunning || false;
   const canStart = !isRunning && !isStarting;
@@ -58,6 +62,16 @@ export function TrainingControls({
         >
           <Play className="h-4 w-4 mr-2" />
           {isStarting ? 'Starting...' : 'Start Training'}
+        </Button>
+        
+        <Button
+          onClick={onQuickStart}
+          disabled={!canStart}
+          variant="outline"
+          className="flex-1"
+        >
+          <Zap className="h-4 w-4 mr-2" />
+          Quick Start
         </Button>
         
         <Button

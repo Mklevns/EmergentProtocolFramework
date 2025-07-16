@@ -444,28 +444,123 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { experimentId, config } = req.body;
       
+      // Create a new experiment if needed
+      let experiment;
+      if (!experimentId) {
+        experiment = await storage.createExperiment({
+          name: config.name || 'New Training Session',
+          description: config.description || 'Bio-inspired MARL training',
+          status: 'created',
+          config: config,
+          metrics: {}
+        });
+      } else {
+        experiment = await storage.getExperiment(experimentId);
+        if (!experiment) {
+          return res.status(404).json({ error: 'Experiment not found' });
+        }
+      }
+      
       // Start Python training process
-      const pythonProcess = spawn('python', [
-        path.join(__dirname, 'services', 'training_orchestrator.py'),
-        '--experiment-id', experimentId.toString(),
-        '--config', JSON.stringify(config)
-      ]);
+      const pythonPath = path.join(process.cwd(), 'server/services/training_execution.py');
+      const pythonProcess = spawn('python3', [pythonPath], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd(),
+        env: { ...process.env, PYTHONPATH: process.cwd() }
+      });
+      
+      // Send training configuration to Python script
+      const trainingConfig = {
+        experiment_id: experiment.id,
+        experiment_name: experiment.name,
+        total_episodes: config.total_episodes || 100,
+        max_steps_per_episode: config.max_steps_per_episode || 200,
+        learning_rate: config.learning_rate || 0.001,
+        batch_size: config.batch_size || 32,
+        hidden_dim: config.hidden_dim || 256,
+        breakthrough_threshold: config.breakthrough_threshold || 0.7,
+        agents: await storage.getAllAgents()
+      };
+      
+      pythonProcess.stdin.write(JSON.stringify(trainingConfig));
+      pythonProcess.stdin.end();
+      
+      let stdout = '';
+      let stderr = '';
       
       pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
         console.log(`Training stdout: ${data}`);
-        broadcast({ type: 'training_log', data: data.toString() });
+        
+        // Try to parse and broadcast metrics
+        try {
+          const lines = data.toString().split('\n');
+          for (const line of lines) {
+            if (line.trim().startsWith('{') && line.trim().endsWith('}')) {
+              const metrics = JSON.parse(line.trim());
+              if (metrics.type === 'training_metrics') {
+                broadcast({ type: 'training_metrics', data: metrics });
+              }
+            }
+          }
+        } catch (e) {
+          // Not JSON, just regular log
+          broadcast({ type: 'training_log', data: data.toString() });
+        }
       });
       
       pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
         console.error(`Training stderr: ${data}`);
         broadcast({ type: 'training_error', data: data.toString() });
       });
       
-      await storage.updateExperimentStatus(experimentId, 'running');
-      broadcast({ type: 'training_started', data: { experimentId } });
+      pythonProcess.on('close', async (code) => {
+        if (code === 0) {
+          try {
+            const trimmedOutput = stdout.trim();
+            const lastJsonLine = trimmedOutput.split('\n').reverse().find(line => 
+              line.trim().startsWith('{') && line.trim().endsWith('}')
+            );
+            
+            if (lastJsonLine) {
+              const trainingResult = JSON.parse(lastJsonLine);
+              
+              // Update experiment with final metrics
+              await storage.updateExperimentMetrics(experiment.id, trainingResult.final_metrics);
+              await storage.updateExperimentStatus(experiment.id, 'completed');
+              
+              broadcast({ 
+                type: 'training_completed', 
+                data: { 
+                  experimentId: experiment.id, 
+                  metrics: trainingResult.final_metrics 
+                } 
+              });
+            }
+          } catch (parseError) {
+            console.error('Failed to parse training results:', parseError);
+            await storage.updateExperimentStatus(experiment.id, 'failed');
+            broadcast({ type: 'training_failed', data: { experimentId: experiment.id } });
+          }
+        } else {
+          console.error('Training process failed:', stderr);
+          await storage.updateExperimentStatus(experiment.id, 'failed');
+          broadcast({ type: 'training_failed', data: { experimentId: experiment.id } });
+        }
+      });
       
-      res.json({ success: true, message: 'Training started' });
+      await storage.updateExperimentStatus(experiment.id, 'running');
+      broadcast({ type: 'training_started', data: { experimentId: experiment.id } });
+      
+      res.json({ 
+        success: true, 
+        message: 'Training started',
+        experimentId: experiment.id,
+        experiment: experiment
+      });
     } catch (error) {
+      console.error('Error starting training:', error);
       res.status(500).json({ error: 'Failed to start training' });
     }
   });
@@ -478,6 +573,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, message: 'Training stopped' });
     } catch (error) {
       res.status(500).json({ error: 'Failed to stop training' });
+    }
+  });
+
+  app.get('/api/training/status', async (req, res) => {
+    try {
+      const experiments = await storage.getAllExperiments();
+      const runningExperiment = experiments.find(exp => exp.status === 'running');
+      
+      if (runningExperiment) {
+        const trainingStatus = await storage.getTrainingStatus(runningExperiment.id);
+        res.json(trainingStatus);
+      } else {
+        res.json({ 
+          experiment: null, 
+          currentEpisode: 0, 
+          currentStep: 0, 
+          recentMetrics: [], 
+          isRunning: false 
+        });
+      }
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to get training status' });
     }
   });
 

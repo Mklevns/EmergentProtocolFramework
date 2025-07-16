@@ -37,6 +37,21 @@ export default function Training() {
   // WebSocket for real-time training updates
   const { data: wsData, isConnected } = useWebSocket('/api/ws');
   
+  // Handle WebSocket training updates
+  useEffect(() => {
+    if (wsData?.type === 'training_started') {
+      queryClient.invalidateQueries({ queryKey: ['/api/experiments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/training/status'] });
+    }
+    if (wsData?.type === 'training_metrics') {
+      queryClient.invalidateQueries({ queryKey: ['/api/training/status'] });
+    }
+    if (wsData?.type === 'training_completed' || wsData?.type === 'training_failed') {
+      queryClient.invalidateQueries({ queryKey: ['/api/experiments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/training/status'] });
+    }
+  }, [wsData, queryClient]);
+  
   // Experiments query
   const { data: experiments, isLoading: experimentsLoading } = useQuery<Experiment[]>({
     queryKey: ['/api/experiments'],
@@ -45,8 +60,7 @@ export default function Training() {
   
   // Training status query
   const { data: trainingStatus } = useQuery<TrainingStatus>({
-    queryKey: ['/api/experiments', selectedExperiment, 'status'],
-    enabled: selectedExperiment !== null,
+    queryKey: ['/api/training/status'],
     refetchInterval: 2000,
   });
   
@@ -82,24 +96,62 @@ export default function Training() {
   
   // Start training mutation
   const startTrainingMutation = useMutation({
-    mutationFn: async (experimentId: number) => {
+    mutationFn: async (config: any) => {
       const response = await apiRequest('POST', '/api/training/start', {
-        experimentId,
-        config: newExperimentConfig,
+        experimentId: selectedExperiment,
+        config,
       });
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/experiments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/training/status'] });
+      setSelectedExperiment(data.experimentId);
       toast({
         title: "Training Started",
-        description: "Training has been started successfully.",
+        description: "Bio-inspired MARL training has been started successfully.",
       });
     },
     onError: (error) => {
       toast({
         title: "Error",
         description: `Failed to start training: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Quick start training mutation
+  const quickStartMutation = useMutation({
+    mutationFn: async () => {
+      const quickConfig = {
+        name: "Quick Training Session",
+        description: "Fast bio-inspired MARL training with default parameters",
+        total_episodes: 50,
+        max_steps_per_episode: 100,
+        learning_rate: 0.01,
+        batch_size: 16,
+        hidden_dim: 128,
+        breakthrough_threshold: 0.6,
+      };
+      const response = await apiRequest('POST', '/api/training/start', {
+        config: quickConfig,
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/experiments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/training/status'] });
+      setSelectedExperiment(data.experimentId);
+      toast({
+        title: "Quick Training Started",
+        description: "Fast bio-inspired MARL training session started with optimized parameters.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to start quick training: ${error.message}`,
         variant: "destructive",
       });
     },
@@ -115,9 +167,10 @@ export default function Training() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/experiments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/training/status'] });
       toast({
         title: "Training Stopped",
-        description: "Training has been stopped successfully.",
+        description: "Bio-inspired MARL training has been stopped successfully.",
       });
     },
     onError: (error) => {
@@ -169,9 +222,11 @@ export default function Training() {
   };
   
   const handleStartTraining = () => {
-    if (selectedExperiment) {
-      startTrainingMutation.mutate(selectedExperiment);
-    }
+    startTrainingMutation.mutate(newExperimentConfig);
+  };
+  
+  const handleQuickStart = () => {
+    quickStartMutation.mutate();
   };
   
   const handleStopTraining = () => {
@@ -289,20 +344,16 @@ export default function Training() {
               <CardTitle>Training Controls</CardTitle>
             </CardHeader>
             <CardContent>
-              {selectedExperiment ? (
-                <TrainingControls
-                  experimentId={selectedExperiment}
-                  trainingStatus={trainingStatus}
-                  onStart={handleStartTraining}
-                  onStop={handleStopTraining}
-                  isStarting={startTrainingMutation.isPending}
-                  isStopping={stopTrainingMutation.isPending}
-                />
-              ) : (
-                <p className="text-sm text-muted-foreground text-center py-8">
-                  Select an experiment to control training
-                </p>
-              )}
+              <TrainingControls
+                experimentId={selectedExperiment}
+                trainingStatus={trainingStatus}
+                onStart={handleStartTraining}
+                onQuickStart={handleQuickStart}
+                onStop={handleStopTraining}
+                isStarting={startTrainingMutation.isPending}
+                isStopping={stopTrainingMutation.isPending}
+                realtimeMetrics={wsData}
+              />
             </CardContent>
           </Card>
           
