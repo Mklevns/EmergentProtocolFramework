@@ -168,6 +168,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Communication system endpoint
+  app.post('/api/simulate-communication', async (req, res) => {
+    try {
+      const agents = await storage.getAllAgents();
+      const pythonPath = path.join(process.cwd(), 'server/services/communication_system.py');
+      
+      const pythonProcess = spawn('python3', [pythonPath], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd()
+      });
+      
+      // Send agents data to Python script
+      pythonProcess.stdin.write(JSON.stringify(agents));
+      pythonProcess.stdin.end();
+      
+      let stdout = '';
+      let stderr = '';
+      
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+      
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+      
+      pythonProcess.on('close', async (code) => {
+        if (code !== 0) {
+          console.error('Python communication simulation failed:', stderr);
+          return res.status(500).json({ error: 'Failed to simulate communication', details: stderr });
+        }
+        
+        try {
+          const trimmedOutput = stdout.trim();
+          
+          if (!trimmedOutput.startsWith('{')) {
+            console.error('Invalid JSON output from Python:', stdout);
+            return res.status(500).json({ error: 'Invalid Python output format' });
+          }
+          
+          const communicationResult = JSON.parse(trimmedOutput);
+          
+          if (communicationResult.success) {
+            // Store messages in the database
+            const messages = [];
+            for (const round of communicationResult.communication_rounds) {
+              for (const message of round.delivered_messages) {
+                const storedMessage = await storage.createMessage({
+                  fromAgentId: message.from_agent_id,
+                  toAgentId: message.to_agent_id,
+                  messageType: message.message_type,
+                  content: message.content,
+                  memoryPointer: message.content.memory_pointer || null,
+                  isProcessed: true
+                });
+                messages.push(storedMessage);
+              }
+            }
+            
+            // Update communication patterns
+            for (const pattern of communicationResult.final_state.communication_patterns) {
+              await storage.updateCommunicationPattern(
+                pattern.from_agent_id,
+                pattern.to_agent_id,
+                pattern.frequency,
+                pattern.efficiency
+              );
+            }
+            
+            // Broadcast communication update via WebSocket
+            broadcast({
+              type: 'communication_simulated',
+              data: {
+                rounds: communicationResult.communication_rounds.length,
+                messages: messages.length,
+                patterns: communicationResult.final_state.communication_patterns.length,
+                efficiency: communicationResult.final_state.network_metrics.network_efficiency,
+                timestamp: new Date().toISOString()
+              }
+            });
+            
+            res.json({
+              success: true,
+              message: 'Communication simulation completed',
+              data: {
+                rounds: communicationResult.communication_rounds.length,
+                messages: messages.length,
+                patterns: communicationResult.final_state.communication_patterns.length,
+                efficiency: communicationResult.final_state.network_metrics.network_efficiency,
+                summary: communicationResult.summary
+              }
+            });
+          } else {
+            res.status(400).json({ error: communicationResult.error });
+          }
+          
+        } catch (parseError) {
+          console.error('Failed to parse communication results:', parseError);
+          console.error('Python stdout:', stdout);
+          console.error('Python stderr:', stderr);
+          res.status(500).json({ error: 'Failed to parse communication results', details: parseError.message });
+        }
+      });
+      
+    } catch (error) {
+      console.error('Error simulating communication:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   // Agent routes
   app.get('/api/agents', async (req, res) => {
     try {

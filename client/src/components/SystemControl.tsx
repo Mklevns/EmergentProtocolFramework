@@ -68,12 +68,37 @@ export function SystemControl() {
     },
   });
 
+  const simulateCommunicationMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('POST', '/api/simulate-communication', {});
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Communication Simulated",
+        description: `Generated ${data.data.messages} messages across ${data.data.rounds} rounds with ${(data.data.efficiency * 100).toFixed(1)}% efficiency`,
+      });
+      queryClient.invalidateQueries();
+    },
+    onError: () => {
+      toast({
+        title: "Communication Failed",
+        description: "Failed to simulate communication patterns",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleInitialize = () => {
     initializeSystemMutation.mutate();
   };
 
   const handleStartTraining = () => {
     startTrainingMutation.mutate();
+  };
+
+  const handleSimulateCommunication = () => {
+    simulateCommunicationMutation.mutate();
   };
 
   const handleReset = () => {
@@ -129,7 +154,31 @@ export function SystemControl() {
 
         <div className="space-y-2">
           <div className="text-sm text-muted-foreground">
-            Phase 2: Start Training Experiment
+            Phase 2: Communication Simulation
+          </div>
+          <Button 
+            onClick={handleSimulateCommunication}
+            disabled={!isInitialized || simulateCommunicationMutation.isPending}
+            className="w-full"
+            variant="default"
+          >
+            {simulateCommunicationMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Simulating Communication...
+              </>
+            ) : (
+              <>
+                <Zap className="mr-2 h-4 w-4" />
+                Simulate Communication
+              </>
+            )}
+          </Button>
+        </div>
+
+        <div className="space-y-2">
+          <div className="text-sm text-muted-foreground">
+            Phase 3: Start Training Experiment
           </div>
           <Button 
             onClick={handleStartTraining}
