@@ -25,11 +25,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-        <div className="p-4 text-center">
-          <h1 className="text-2xl font-bold mb-4">Bio-Inspired MARL System</h1>
-          <p className="text-muted-foreground mb-4">System is loading...</p>
-          <Router />
-        </div>
+        <Router />
       </TooltipProvider>
     </QueryClientProvider>
   );
