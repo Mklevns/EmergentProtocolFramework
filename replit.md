@@ -1,0 +1,109 @@
+# Brain-Inspired Multi-Agent Reinforcement Learning System
+
+## Overview
+
+This is a sophisticated multi-agent reinforcement learning (MARL) system that mimics brain-like neural networks through a 3D agent grid. The system features 30 intelligent agents organized in a 4×3×3 grid structure, with hierarchical communication protocols and shared vectorized memory. The architecture emphasizes emergent communication patterns, breakthrough detection, and real-time visualization of agent interactions.
+
+## User Preferences
+
+```
+Preferred communication style: Simple, everyday language.
+```
+
+## System Architecture
+
+### Frontend Architecture
+- **Framework**: React with TypeScript and Vite
+- **Styling**: Tailwind CSS with shadcn/ui components
+- **State Management**: TanStack Query for server state management
+- **Routing**: Wouter for client-side routing
+- **Real-time Communication**: WebSocket integration for live updates
+
+### Backend Architecture
+- **Runtime**: Node.js with Express.js
+- **Database**: PostgreSQL with Drizzle ORM
+- **Real-time Updates**: WebSocket server for live data streaming
+- **Python Services**: Bio-inspired MARL framework with specialized services
+
+## Key Components
+
+### 1. Agent Grid System
+- **3D Grid Structure**: 4×3×3 grid housing 30 agents (27 regular + 3 coordinators)
+- **Agent Types**: 
+  - Regular agents: Handle local tasks and communication
+  - Coordinator agents: Manage regional oversight and inter-coordinator communication
+- **Spatial Positioning**: Each agent has x, y, z coordinates in the 3D space
+
+### 2. Communication Protocol
+- **Hierarchical Communication**: Multi-level message routing system
+- **Message Types**: pointer, broadcast, breakthrough, coordination, heartbeat
+- **Emergent Protocols**: System learns efficient communication patterns over time
+- **Vectorized Information**: Messages use compact vector representations
+
+### 3. Shared Memory System
+- **Vectorized Storage**: Efficient lookup table for shared information
+- **Memory Types**: breakthrough, context, coordination, memory_trace, pattern
+- **Pointer-based Access**: Agents share memory locations rather than full data
+- **Access Patterns**: Tracks usage for optimization
+
+### 4. Breakthrough Detection
+- **Pattern Recognition**: Identifies significant agent achievements
+- **Types**: pattern_recognition, coordination_improvement, efficiency_gain, novel_strategy
+- **Real-time Analysis**: Continuous monitoring of agent performance
+- **Validation System**: Confirms breakthrough authenticity
+
+### 5. Training Orchestrator
+- **Episode Management**: Coordinates training sessions
+- **Metrics Collection**: Gathers performance data
+- **Configuration**: Flexible training parameters
+- **Status Tracking**: Real-time training progress
+
+## Data Flow
+
+1. **Agent Initialization**: Agents are placed in 3D grid with assigned regions
+2. **Communication Flow**: Messages flow through hierarchical network
+3. **Memory Management**: Breakthroughs stored as vectors in shared memory
+4. **Real-time Updates**: WebSocket broadcasts state changes to frontend
+5. **Visualization**: 3D rendering of agent interactions and communication patterns
+
+## External Dependencies
+
+### Database
+- **PostgreSQL**: Primary data storage via Neon serverless
+- **Drizzle ORM**: Type-safe database queries and migrations
+- **Connection**: Environment-based DATABASE_URL configuration
+
+### Real-time Communication
+- **WebSocket**: Live updates between frontend and backend
+- **Event Broadcasting**: Multi-client support for real-time data
+
+### UI Framework
+- **Radix UI**: Accessible component primitives
+- **Tailwind CSS**: Utility-first styling
+- **shadcn/ui**: Pre-built component library
+
+### Python Services
+- **Bio-inspired Framework**: Advanced MARL algorithms
+- **NumPy/PyTorch**: Numerical computing and neural networks
+- **NetworkX**: Graph analysis for agent networks
+
+## Deployment Strategy
+
+### Development Environment
+- **Vite Dev Server**: Hot module replacement for frontend
+- **tsx**: TypeScript execution for backend
+- **Concurrent Services**: Express server with Python services
+
+### Production Build
+- **Frontend**: Vite build with static file serving
+- **Backend**: ESBuild compilation to Node.js bundle
+- **Database**: Drizzle migrations with push deployment
+- **Environment**: Docker-compatible with environment variables
+
+### Key Scripts
+- `npm run dev`: Development server with hot reload
+- `npm run build`: Production build process
+- `npm run start`: Production server startup
+- `npm run db:push`: Database schema deployment
+
+The system is designed for scalability and real-time performance, with emphasis on emergent behavior observation and breakthrough detection in multi-agent environments.

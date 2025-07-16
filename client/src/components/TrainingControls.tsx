@@ -1,0 +1,171 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { TrainingStatus } from '@/lib/agent-types';
+import { Play, Pause, Square, RotateCcw, Settings } from 'lucide-react';
+
+interface TrainingControlsProps {
+  experimentId: number;
+  trainingStatus: TrainingStatus | undefined;
+  onStart: () => void;
+  onStop: () => void;
+  isStarting: boolean;
+  isStopping: boolean;
+}
+
+export function TrainingControls({
+  experimentId,
+  trainingStatus,
+  onStart,
+  onStop,
+  isStarting,
+  isStopping
+}: TrainingControlsProps) {
+  const isRunning = trainingStatus?.isRunning || false;
+  const canStart = !isRunning && !isStarting;
+  const canStop = isRunning && !isStopping;
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'running': return 'bg-green-500';
+      case 'completed': return 'bg-blue-500';
+      case 'failed': return 'bg-red-500';
+      case 'stopped': return 'bg-yellow-500';
+      default: return 'bg-gray-500';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'running': return 'Running';
+      case 'completed': return 'Completed';
+      case 'failed': return 'Failed';
+      case 'stopped': return 'Stopped';
+      default: return 'Pending';
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Control Buttons */}
+      <div className="flex gap-2">
+        <Button
+          onClick={onStart}
+          disabled={!canStart}
+          className="flex-1"
+          variant={canStart ? 'default' : 'secondary'}
+        >
+          <Play className="h-4 w-4 mr-2" />
+          {isStarting ? 'Starting...' : 'Start Training'}
+        </Button>
+        
+        <Button
+          onClick={onStop}
+          disabled={!canStop}
+          variant="destructive"
+          className="flex-1"
+        >
+          <Square className="h-4 w-4 mr-2" />
+          {isStopping ? 'Stopping...' : 'Stop Training'}
+        </Button>
+      </div>
+
+      {/* Status Information */}
+      {trainingStatus && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Status:</span>
+            <Badge variant={isRunning ? 'default' : 'secondary'}>
+              <div className={`w-2 h-2 rounded-full mr-2 ${getStatusColor(trainingStatus.experiment.status)}`} />
+              {getStatusText(trainingStatus.experiment.status)}
+            </Badge>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Episode:</span>
+              <span className="font-medium">{trainingStatus.currentEpisode}</span>
+            </div>
+            
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Step:</span>
+              <span className="font-medium">{trainingStatus.currentStep}</span>
+            </div>
+            
+            {trainingStatus.experiment.config && (
+              <div className="space-y-1">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Progress:</span>
+                  <span className="font-medium">
+                    {((trainingStatus.currentEpisode / trainingStatus.experiment.config.total_episodes) * 100).toFixed(1)}%
+                  </span>
+                </div>
+                <Progress 
+                  value={(trainingStatus.currentEpisode / trainingStatus.experiment.config.total_episodes) * 100} 
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Training Configuration */}
+      {trainingStatus?.experiment.config && (
+        <div className="space-y-2 p-3 bg-muted rounded-lg">
+          <div className="flex items-center gap-2 mb-2">
+            <Settings className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium">Configuration</span>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div>
+              <span className="text-muted-foreground">Episodes:</span>
+              <span className="ml-1 font-medium">{trainingStatus.experiment.config.total_episodes}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Learning Rate:</span>
+              <span className="ml-1 font-medium">{trainingStatus.experiment.config.learning_rate}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Batch Size:</span>
+              <span className="ml-1 font-medium">{trainingStatus.experiment.config.batch_size}</span>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Hidden Dim:</span>
+              <span className="ml-1 font-medium">{trainingStatus.experiment.config.hidden_dim}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Training Actions */}
+      <div className="flex gap-2">
+        <Button variant="outline" size="sm" disabled={isRunning} className="flex-1">
+          <RotateCcw className="h-4 w-4 mr-2" />
+          Reset
+        </Button>
+        
+        <Button variant="outline" size="sm" disabled={isRunning} className="flex-1">
+          <Settings className="h-4 w-4 mr-2" />
+          Configure
+        </Button>
+      </div>
+
+      {/* Recent Metrics Summary */}
+      {trainingStatus?.recentMetrics && trainingStatus.recentMetrics.length > 0 && (
+        <div className="p-3 bg-muted rounded-lg">
+          <div className="text-sm font-medium mb-2">Recent Performance</div>
+          <div className="space-y-1">
+            {trainingStatus.recentMetrics.slice(-3).map((metric, index) => (
+              <div key={index} className="flex justify-between text-xs">
+                <span className="text-muted-foreground">{metric.metricType}:</span>
+                <span className="font-medium">{metric.value.toFixed(3)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
