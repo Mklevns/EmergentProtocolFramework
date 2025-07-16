@@ -20,7 +20,7 @@ export default function Dashboard() {
   const [timeRange, setTimeRange] = useState<'1h' | '6h' | '24h' | '7d'>('1h');
   
   // WebSocket for real-time updates
-  const { data: wsData, isConnected } = useWebSocket('/ws');
+  const { data: wsData, isConnected } = useWebSocket('/api/ws');
   
   // Grid data query
   const { data: gridData, isLoading: gridLoading } = useQuery<AgentGridData>({

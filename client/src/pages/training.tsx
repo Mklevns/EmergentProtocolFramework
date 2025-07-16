@@ -35,7 +35,7 @@ export default function Training() {
   const queryClient = useQueryClient();
   
   // WebSocket for real-time training updates
-  const { data: wsData, isConnected } = useWebSocket('/ws');
+  const { data: wsData, isConnected } = useWebSocket('/api/ws');
   
   // Experiments query
   const { data: experiments, isLoading: experimentsLoading } = useQuery<Experiment[]>({

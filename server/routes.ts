@@ -9,33 +9,45 @@ import path from "path";
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
   
-  // Only setup WebSocket in production to avoid conflicts with Vite HMR
+  // Setup WebSocket server but handle it carefully to avoid conflicts
   let wss: WebSocketServer | null = null;
   let broadcast: (data: any) => void = () => {};
   
-  if (process.env.NODE_ENV === 'production') {
-    wss = new WebSocketServer({ server: httpServer });
+  try {
+    // Use a different path for WebSocket to avoid conflicts with Vite HMR
+    wss = new WebSocketServer({ 
+      server: httpServer,
+      path: '/api/ws'
+    });
 
     // WebSocket for real-time updates
     wss.on('connection', (ws) => {
       console.log('Client connected to WebSocket');
       
       ws.on('message', (message) => {
-        const data = JSON.parse(message.toString());
-        
-        // Handle different message types
-        switch (data.type) {
-          case 'subscribe':
-            // Subscribe to specific data feeds
-            break;
-          case 'unsubscribe':
-            // Unsubscribe from data feeds
-            break;
+        try {
+          const data = JSON.parse(message.toString());
+          
+          // Handle different message types
+          switch (data.type) {
+            case 'subscribe':
+              // Subscribe to specific data feeds
+              break;
+            case 'unsubscribe':
+              // Unsubscribe from data feeds
+              break;
+          }
+        } catch (err) {
+          console.error('Failed to parse WebSocket message:', err);
         }
       });
       
       ws.on('close', () => {
         console.log('Client disconnected from WebSocket');
+      });
+      
+      ws.on('error', (error) => {
+        console.error('WebSocket error:', error);
       });
     });
 
@@ -47,6 +59,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
     };
+  } catch (error) {
+    console.error('Failed to setup WebSocket server:', error);
+    // Continue without WebSocket if it fails
   }
 
   // Agent routes

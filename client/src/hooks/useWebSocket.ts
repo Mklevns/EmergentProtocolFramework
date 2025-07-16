@@ -37,12 +37,15 @@ export function useWebSocket(url: string) {
         setIsConnected(false);
         console.log('WebSocket disconnected');
         
-        // Attempt to reconnect
+        // Attempt to reconnect only if we haven't exceeded max attempts
         if (reconnectAttempts.current < maxReconnectAttempts) {
           reconnectAttempts.current++;
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();
           }, 1000 * Math.pow(2, reconnectAttempts.current)); // Exponential backoff
+        } else {
+          console.log('WebSocket max reconnection attempts reached');
+          setError('WebSocket connection failed after multiple attempts');
         }
       };
 
