@@ -92,46 +92,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         try {
-          // Find the JSON output from Python (it should be after the printed messages)
-          const lines = stdout.split('\n');
-          const jsonLine = lines.find(line => line.trim().startsWith('{'));
+          // Parse the full JSON output from Python
+          const trimmedOutput = stdout.trim();
           
-          if (!jsonLine) {
-            console.error('No JSON found in Python output:', stdout);
+          if (!trimmedOutput.startsWith('{')) {
+            console.error('Invalid JSON output from Python:', stdout);
             return res.status(500).json({ error: 'Invalid Python output format' });
           }
           
-          const systemState = JSON.parse(jsonLine);
+          const systemState = JSON.parse(trimmedOutput);
           
           // Clear existing data and populate with new agents
           await storage.clearAll();
           
           // Create agents
           for (const agentData of systemState.agents) {
-            await storage.createAgent({
-              id: agentData.agent_id,
-              type: agentData.agent_type,
-              position: agentData.position,
-              coordinatorId: agentData.coordinator_id,
-              region: agentData.region,
-              communicationRange: agentData.communication_range,
-              neighbors: agentData.neighbors,
-              isActive: agentData.is_active,
-              status: agentData.status,
-              activityLevel: agentData.activity_level,
-              communicationLoad: agentData.communication_load
-            });
+            try {
+              await storage.createAgent({
+                agentId: agentData.agent_id,
+                type: agentData.agent_type,
+                positionX: agentData.position.x,
+                positionY: agentData.position.y,
+                positionZ: agentData.position.z,
+                coordinatorId: agentData.coordinator_id,
+                status: agentData.status,
+                isActive: agentData.is_active,
+                hiddenDim: 256
+              });
+            } catch (agentError) {
+              console.error('Error creating agent:', agentData.agent_id, agentError);
+              throw agentError;
+            }
           }
           
           // Create initial experiment
           const experiment = await storage.createExperiment({
             name: systemState.experimentConfig.name,
             description: systemState.experimentConfig.description,
-            totalEpisodes: systemState.experimentConfig.totalEpisodes,
-            learningRate: systemState.experimentConfig.learningRate,
-            batchSize: systemState.experimentConfig.batchSize,
-            hiddenDim: systemState.experimentConfig.hiddenDim,
-            breakthroughThreshold: systemState.experimentConfig.breakthroughThreshold,
+            config: systemState.experimentConfig,
             status: 'initialized'
           });
           
@@ -159,7 +157,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } catch (parseError) {
           console.error('Failed to parse Python output:', parseError);
           console.error('Python stdout:', stdout);
-          res.status(500).json({ error: 'Failed to parse initialization data' });
+          console.error('Python stderr:', stderr);
+          res.status(500).json({ error: 'Failed to parse initialization data', details: parseError.message });
         }
       });
       
