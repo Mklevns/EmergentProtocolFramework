@@ -8,39 +8,46 @@ import path from "path";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
-  const wss = new WebSocketServer({ server: httpServer });
+  
+  // Only setup WebSocket in production to avoid conflicts with Vite HMR
+  let wss: WebSocketServer | null = null;
+  let broadcast: (data: any) => void = () => {};
+  
+  if (process.env.NODE_ENV === 'production') {
+    wss = new WebSocketServer({ server: httpServer });
 
-  // WebSocket for real-time updates
-  wss.on('connection', (ws) => {
-    console.log('Client connected to WebSocket');
-    
-    ws.on('message', (message) => {
-      const data = JSON.parse(message.toString());
+    // WebSocket for real-time updates
+    wss.on('connection', (ws) => {
+      console.log('Client connected to WebSocket');
       
-      // Handle different message types
-      switch (data.type) {
-        case 'subscribe':
-          // Subscribe to specific data feeds
-          break;
-        case 'unsubscribe':
-          // Unsubscribe from data feeds
-          break;
-      }
+      ws.on('message', (message) => {
+        const data = JSON.parse(message.toString());
+        
+        // Handle different message types
+        switch (data.type) {
+          case 'subscribe':
+            // Subscribe to specific data feeds
+            break;
+          case 'unsubscribe':
+            // Unsubscribe from data feeds
+            break;
+        }
+      });
+      
+      ws.on('close', () => {
+        console.log('Client disconnected from WebSocket');
+      });
     });
-    
-    ws.on('close', () => {
-      console.log('Client disconnected from WebSocket');
-    });
-  });
 
-  // Broadcast function for real-time updates
-  const broadcast = (data: any) => {
-    wss.clients.forEach((client) => {
-      if (client.readyState === 1) { // WebSocket.OPEN
-        client.send(JSON.stringify(data));
-      }
-    });
-  };
+    // Broadcast function for real-time updates
+    broadcast = (data: any) => {
+      wss?.clients.forEach((client) => {
+        if (client.readyState === 1) { // WebSocket.OPEN
+          client.send(JSON.stringify(data));
+        }
+      });
+    };
+  }
 
   // Agent routes
   app.get('/api/agents', async (req, res) => {

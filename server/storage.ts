@@ -92,6 +92,10 @@ export class MemStorage implements IStorage {
     const agent: Agent = {
       ...insertAgent,
       id: this.currentId++,
+      status: insertAgent.status || "idle",
+      coordinatorId: insertAgent.coordinatorId || null,
+      hiddenDim: insertAgent.hiddenDim || 256,
+      isActive: insertAgent.isActive !== false,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -124,6 +128,7 @@ export class MemStorage implements IStorage {
     const message: Message = {
       ...insertMessage,
       id: this.currentId++,
+      memoryPointer: insertMessage.memoryPointer || null,
       timestamp: new Date(),
       isProcessed: false,
     };
@@ -150,7 +155,7 @@ export class MemStorage implements IStorage {
   
   async getRecentMessages(limit = 50): Promise<Message[]> {
     return Array.from(this.messages.values())
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      .sort((a, b) => (b.timestamp || new Date()).getTime() - (a.timestamp || new Date()).getTime())
       .slice(0, limit);
   }
   
@@ -159,6 +164,8 @@ export class MemStorage implements IStorage {
     const vector: MemoryVector = {
       ...insertVector,
       id: this.currentId++,
+      coordinates: insertVector.coordinates || null,
+      importance: insertVector.importance || 0.5,
       accessCount: 0,
       createdAt: new Date(),
       lastAccessed: new Date(),
@@ -178,7 +185,7 @@ export class MemStorage implements IStorage {
   async updateMemoryAccess(vectorId: string): Promise<void> {
     const vector = this.memoryVectors.get(vectorId);
     if (vector) {
-      vector.accessCount++;
+      vector.accessCount = (vector.accessCount || 0) + 1;
       vector.lastAccessed = new Date();
     }
   }
@@ -192,6 +199,10 @@ export class MemStorage implements IStorage {
     const breakthrough: Breakthrough = {
       ...insertBreakthrough,
       id: this.currentId++,
+      description: insertBreakthrough.description || null,
+      vectorId: insertBreakthrough.vectorId || null,
+      confidence: insertBreakthrough.confidence || 0.0,
+      wasShared: insertBreakthrough.wasShared || false,
       timestamp: new Date(),
     };
     this.breakthroughs.set(breakthrough.id, breakthrough);
@@ -204,7 +215,7 @@ export class MemStorage implements IStorage {
   
   async getRecentBreakthroughs(limit = 20): Promise<Breakthrough[]> {
     return Array.from(this.breakthroughs.values())
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      .sort((a, b) => (b.timestamp || new Date()).getTime() - (a.timestamp || new Date()).getTime())
       .slice(0, limit);
   }
   
@@ -220,6 +231,11 @@ export class MemStorage implements IStorage {
     const experiment: Experiment = {
       ...insertExperiment,
       id: this.currentId++,
+      description: insertExperiment.description || null,
+      status: insertExperiment.status || "pending",
+      startTime: null,
+      endTime: null,
+      metrics: insertExperiment.metrics || null,
       createdAt: new Date(),
     };
     this.experiments.set(experiment.id, experiment);
@@ -259,6 +275,7 @@ export class MemStorage implements IStorage {
     const metric: Metric = {
       ...insertMetric,
       id: this.currentId++,
+      agentId: insertMetric.agentId || null,
       timestamp: new Date(),
     };
     this.metricsMap.set(metric.id, metric);
@@ -271,7 +288,7 @@ export class MemStorage implements IStorage {
   
   async getRecentMetrics(limit = 100): Promise<Metric[]> {
     return Array.from(this.metricsMap.values())
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      .sort((a, b) => (b.timestamp || new Date()).getTime() - (a.timestamp || new Date()).getTime())
       .slice(0, limit);
   }
   
@@ -280,6 +297,9 @@ export class MemStorage implements IStorage {
     const pattern: CommunicationPattern = {
       ...insertPattern,
       id: this.currentId++,
+      frequency: insertPattern.frequency || 1,
+      efficiency: insertPattern.efficiency || 0.0,
+      patternType: insertPattern.patternType || null,
       lastCommunication: new Date(),
     };
     const key = `${pattern.fromAgentId}-${pattern.toAgentId}`;
@@ -340,15 +360,15 @@ export class MemStorage implements IStorage {
     const vectors = await this.getAllMemoryVectors();
     const total = 1000; // simulated memory capacity
     const used = vectors.length;
-    const efficiency = used > 0 ? vectors.reduce((sum, v) => sum + v.accessCount, 0) / used : 0;
+    const efficiency = used > 0 ? vectors.reduce((sum, v) => sum + (v.accessCount || 0), 0) / used : 0;
     
     const recentAccess = vectors
-      .sort((a, b) => b.lastAccessed.getTime() - a.lastAccessed.getTime())
+      .sort((a, b) => (b.lastAccessed || new Date()).getTime() - (a.lastAccessed || new Date()).getTime())
       .slice(0, 10)
       .map(v => ({
         vectorId: v.vectorId,
         agentId: v.coordinates || "unknown",
-        timestamp: v.lastAccessed.toISOString(),
+        timestamp: (v.lastAccessed || new Date()).toISOString(),
       }));
     
     return {
