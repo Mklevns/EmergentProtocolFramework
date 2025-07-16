@@ -13,6 +13,7 @@ import { MemoryVisualization } from "@/components/MemoryVisualization";
 import { MetricsPanel } from "@/components/MetricsPanel";
 import { BreakthroughPanel } from "@/components/BreakthroughPanel";
 import { SystemControl } from "@/components/SystemControl";
+import { CommunicationMetrics } from "@/components/CommunicationMetrics";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { AgentGridData, TrainingStatus } from "@/lib/agent-types";
 
@@ -276,21 +277,7 @@ export default function Dashboard() {
           </TabsContent>
           
           <TabsContent value="communication">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5" />
-                  Communication Flows
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CommunicationFlow 
-                  agents={gridData?.agents || []}
-                  messages={gridData?.activeMessages || []}
-                  patterns={commPatterns || []}
-                />
-              </CardContent>
-            </Card>
+            <CommunicationMetrics />
           </TabsContent>
           
           <TabsContent value="memory">
