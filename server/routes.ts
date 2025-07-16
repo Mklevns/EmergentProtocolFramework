@@ -64,6 +64,111 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Continue without WebSocket if it fails
   }
 
+  // Agent initialization endpoint
+  app.post('/api/init-agents', async (req, res) => {
+    try {
+      const pythonPath = path.join(process.cwd(), 'server/services/agent_initialization.py');
+      
+      const pythonProcess = spawn('python3', [pythonPath], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd()
+      });
+      
+      let stdout = '';
+      let stderr = '';
+      
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+      
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+      
+      pythonProcess.on('close', async (code) => {
+        if (code !== 0) {
+          console.error('Python agent initialization failed:', stderr);
+          return res.status(500).json({ error: 'Failed to initialize agents', details: stderr });
+        }
+        
+        try {
+          // Find the JSON output from Python (it should be after the printed messages)
+          const lines = stdout.split('\n');
+          const jsonLine = lines.find(line => line.trim().startsWith('{'));
+          
+          if (!jsonLine) {
+            console.error('No JSON found in Python output:', stdout);
+            return res.status(500).json({ error: 'Invalid Python output format' });
+          }
+          
+          const systemState = JSON.parse(jsonLine);
+          
+          // Clear existing data and populate with new agents
+          await storage.clearAll();
+          
+          // Create agents
+          for (const agentData of systemState.agents) {
+            await storage.createAgent({
+              id: agentData.agent_id,
+              type: agentData.agent_type,
+              position: agentData.position,
+              coordinatorId: agentData.coordinator_id,
+              region: agentData.region,
+              communicationRange: agentData.communication_range,
+              neighbors: agentData.neighbors,
+              isActive: agentData.is_active,
+              status: agentData.status,
+              activityLevel: agentData.activity_level,
+              communicationLoad: agentData.communication_load
+            });
+          }
+          
+          // Create initial experiment
+          const experiment = await storage.createExperiment({
+            name: systemState.experimentConfig.name,
+            description: systemState.experimentConfig.description,
+            totalEpisodes: systemState.experimentConfig.totalEpisodes,
+            learningRate: systemState.experimentConfig.learningRate,
+            batchSize: systemState.experimentConfig.batchSize,
+            hiddenDim: systemState.experimentConfig.hiddenDim,
+            breakthroughThreshold: systemState.experimentConfig.breakthroughThreshold,
+            status: 'initialized'
+          });
+          
+          // Broadcast initialization update via WebSocket
+          broadcast({
+            type: 'system_initialized',
+            data: {
+              agents: systemState.agents,
+              experiment: experiment,
+              gridDimensions: systemState.gridDimensions,
+              timestamp: new Date().toISOString()
+            }
+          });
+          
+          res.json({
+            success: true,
+            message: 'Agents initialized successfully',
+            data: {
+              totalAgents: systemState.totalAgents,
+              coordinatorCount: systemState.coordinatorCount,
+              experimentId: experiment.id
+            }
+          });
+          
+        } catch (parseError) {
+          console.error('Failed to parse Python output:', parseError);
+          console.error('Python stdout:', stdout);
+          res.status(500).json({ error: 'Failed to parse initialization data' });
+        }
+      });
+      
+    } catch (error) {
+      console.error('Error initializing agents:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   // Agent routes
   app.get('/api/agents', async (req, res) => {
     try {

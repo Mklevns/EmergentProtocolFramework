@@ -74,6 +74,9 @@ export interface IStorage {
   getAgentGridData(): Promise<AgentGridData>;
   getTrainingStatus(experimentId: number): Promise<TrainingStatus | undefined>;
   getMemoryState(): Promise<MemoryState>;
+  
+  // System operations
+  clearAll(): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -376,6 +379,17 @@ export class MemStorage implements IStorage {
       usage: { total, used, efficiency },
       recentAccess,
     };
+  }
+
+  async clearAll(): Promise<void> {
+    this.agents.clear();
+    this.messages.clear();
+    this.memoryVectors.clear();
+    this.breakthroughs.clear();
+    this.experiments.clear();
+    this.metricsMap.clear();
+    this.communicationPatterns.clear();
+    this.currentId = 1;
   }
 }
 

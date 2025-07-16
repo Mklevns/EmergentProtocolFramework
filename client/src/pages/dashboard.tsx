@@ -12,6 +12,7 @@ import { CommunicationFlow } from "@/components/CommunicationFlow";
 import { MemoryVisualization } from "@/components/MemoryVisualization";
 import { MetricsPanel } from "@/components/MetricsPanel";
 import { BreakthroughPanel } from "@/components/BreakthroughPanel";
+import { SystemControl } from "@/components/SystemControl";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { AgentGridData, TrainingStatus } from "@/lib/agent-types";
 
@@ -204,7 +205,7 @@ export default function Dashboard() {
           </TabsList>
           
           <TabsContent value="grid" className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
               <Card className="lg:col-span-2">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -221,6 +222,10 @@ export default function Dashboard() {
                   />
                 </CardContent>
               </Card>
+              
+              <div className="space-y-4">
+                <SystemControl />
+              </div>
               
               <Card>
                 <CardHeader>
