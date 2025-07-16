@@ -1,0 +1,60 @@
+Okay, let's detail the 3D agent grid and the communication system.
+
+---
+
+### The 3D Brain-Inspired Agent Grid
+
+Our framework will feature a **3D brain-inspired grid** designed to house **30 "real" agents**. These agents are stationary and form the higher-level strategic network, analogous to neurons in a brain.
+
+**Grid Structure and Agent Placement:**
+
+* **Size and Shape:** To accommodate 30 agents while maintaining a roughly cubic, near-optimal distribution, we will use a **$4 \times 3 \times 3$ grid structure**, giving us 36 potential positions. This allows for a small amount of "empty space" to ensure even distribution and communication range.
+* **Agent Distribution:**
+    * **Regular Agents (27 total):** These agents will primarily occupy the nodes of the $3 \times 3 \times 3$ sub-grid within the larger $4 \times 3 \times 3$ structure, and potentially fill the additional slots to reach 27. Their placement will aim for local connectivity.
+    * **Coordinator Agents (3 total):** These are specialized agents responsible for facilitating broader communication and information flow. They will be strategically placed at more central or well-connected positions within the 3D grid. The goal is to ensure each coordinator has a roughly equal "quadrant" or "region" of regular agents it can directly communicate with, and that they can easily communicate among themselves. For example, they might be placed at key intersections or central points to maximize their reach within their assigned region.
+* **Neighbor Connectivity:** Each agent (both regular and coordinator) will typically communicate directly with its **nearest neighbors**, aiming for approximately four to five direct connections, similar to local synaptic connections. This local connectivity forms the foundation of the emergent communication.
+
+**Coordinator Agent Specialization and Responsibilities:**
+
+The three coordinator agents are crucial for overarching information dissemination:
+
+1.  **Regional Oversight:** Each coordinator agent will be conceptually "in charge" of a specific geographical **section or quadrant** of the 3D brain-inspired grid. They can directly communicate with all regular agents within their assigned region.
+2.  **Inter-Coordinator Communication:** The three coordinator agents **can directly communicate with each other**. This is vital for propagating information across different regions of the entire 3D network.
+3.  **No Direct Cross-Region Regular Agent Communication:** A coordinator agent **cannot directly communicate with regular agents outside its assigned section**. Information from one section must pass through its regional coordinator, then to another coordinator, and finally down to regular agents in that other coordinator's section. This enforces a hierarchical, brain-like information flow.
+
+---
+
+### The Emergent Communication System
+
+The core of our experiment is to observe the emergence of an ultra-efficient communication system between these agents. This system relies on **vectored information** and **lookup tables** to minimize communication overhead.
+
+**1. Latent Vectorized Space (Memory):**
+
+* **Purpose:** This shared, **latent vectorized space** acts as a global memory or blackboard for the entire 3D agent network. It's designed to store important information and context that agents need to access over time, without explicit, verbose message passing.
+* **Structure:** It consists of a **lookup table**. This table stores vectorized representations of significant events, insights, or contextual data.
+* **Efficiency:** Using fixed-size vectors for each piece of information ensures efficient storage and retrieval. Accessing information involves simply looking up the vector at a given coordinate (pointer) in the table, minimizing computational cost.
+
+**2. Communication Protocol:**
+
+The communication system is designed to be highly efficient and encourage emergent protocols, mirroring how information propagates in neural networks.
+
+* **Regular Agent Communication (Local & Coordinator-Proximal):**
+    * Regular agents primarily communicate with their immediate neighbors.
+    * When a regular agent achieves a **"breakthrough"** (e.g., solving a sub-puzzle in the virtual maze, obtaining a power-up in the virtual maze), it performs the following:
+        1.  **Vectorize Information:** It converts the significant information about its breakthrough (what happened, how it was achieved) into a compact, fixed-size **vectorized representation**.
+        2.  **Store in Latent Space (via Coordinator Request):** It sends this vectorized information to its **regional coordinator agent**, along with a request to store it in the shared lookup table.
+        3.  **Pointer Request:** The coordinator processes this, stores the vector, and provides the regular agent with the **coordinates (a pointer)** to where the information is now stored in the lookup table.
+        4.  **Local Message (Pointer):** The regular agent can then share this *pointer* to the lookup table with its direct neighbors if relevant to local coordination.
+* **Coordinator Agent Communication (Broadcasts via Pointers):**
+    * This is the critical element for widespread information dissemination.
+    * Upon receiving a breakthrough message (vectorized information) from a regular agent in its section, or generating its own significant insight:
+        1.  **Write to Latent Space:** The coordinator agent is uniquely empowered to **write** this vectorized information into the shared latent space's lookup table.
+        2.  **Generate Pointer:** It obtains the coordinates (pointer) for this newly stored information.
+        3.  **Broadcast (Pointer Only):** The coordinator then **broadcasts this *pointer*** (the lookup table coordinates) to:
+            * **All other regular agents within its own assigned section.**
+            * **The other two coordinator agents.**
+    * This means that actual "messages" sent across the network are extremely small – just the coordinates of where to find the detailed vectorized information in the central lookup table.
+* **Information Retrieval:**
+    * Any agent (regular or coordinator) receiving a broadcasted pointer can then **read** from the specified coordinates in the shared latent space's lookup table to retrieve the full vectorized information. This allows agents to access context and breakthroughs from across the entire network without large, redundant data transfers.
+
+This system aims to force agents to develop efficient "indexing" and "retrieval" strategies, leading to emergent communication protocols that prioritize information pointers over raw data transmission, similar to how brains selectively attend to and retrieve memories.
