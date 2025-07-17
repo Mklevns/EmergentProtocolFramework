@@ -1,0 +1,137 @@
+Browsing Topics API removed from https://replit.com/@Block2Chainz/EmergentProtocolFramework which is main frame
+_app-c8f6cc98a14c1088.js:38 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+cdn.segment.com/v1/projects/dMePKGC4BqfBivpe0Hvl8IoPpzSHgjdX/settings:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENTUnderstand this error
+_app-c8f6cc98a14c1088.js:38 Failed to fetch
+(anonymous) @ _app-c8f6cc98a14c1088.js:38Understand this error
+_app-c8f6cc98a14c1088.js:38 [analytics.js] Failed to load Analytics.js TypeError: Failed to fetch
+    at _app-c8f6cc98a14c1088.js:38:9046
+    at o (sdk.min.js:1:23763)
+    at index.ts:34:26
+    at tslib.es6.js:103:23
+    at Object.next (tslib.es6.js:108:37)
+    at tslib.es6.js:80:8
+    at new Promise (<anonymous>)
+    at u (tslib.es6.js:72:27)
+    at re (index.ts:239:4)
+    at index.ts:338:7
+(anonymous) @ _app-c8f6cc98a14c1088.js:38Understand this error
+api.segment.io/v1/m:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENTUnderstand this error
+_app-c8f6cc98a14c1088.js:38 Error sending segment performance metrics TypeError: Failed to fetch
+    at _app-c8f6cc98a14c1088.js:38:9046
+    at o (sdk.min.js:1:23763)
+    at t.<anonymous> (remote-metrics.ts:138:12)
+    at tslib.es6.js:103:23
+    at Object.next (tslib.es6.js:108:37)
+    at tslib.es6.js:80:8
+    at new Promise (<anonymous>)
+    at u (tslib.es6.js:72:27)
+    at i.148.t.send (sdk.min.js:1:22021)
+    at t.<anonymous> (remote-metrics.ts:125:16)
+    at tslib.es6.js:103:23
+    at Object.next (tslib.es6.js:108:37)
+    at tslib.es6.js:80:8
+    at new Promise (<anonymous>)
+    at u (tslib.es6.js:72:27)
+    at t.flush (sdk.min.js:1:21754)
+    at t.increment (remote-metrics.ts:116:12)
+    at fe (standalone.ts:38:21)
+    at standalone.ts:47:5
+    at tslib.es6.js:103:23
+    at Object.throw (tslib.es6.js:108:37)
+    at u (tslib.es6.js:74:102)
+(anonymous) @ _app-c8f6cc98a14c1088.js:38Understand this error
+42Unchecked runtime.lastError: The message port closed before a response was received.Understand this error
+_app-c8f6cc98a14c1088.js:38 [LaunchDarkly] LaunchDarkly client initialized
+ Browsing Topics API removed from https://js.stripe.com/v3/controller-with-preconnect-0aaa0828d7ec7dafcb9783c9fedb9f0f.html#__shared_params__[version]=acacia&apiKey=pk_live_515YpNsJAmnYVOvfnsBqRdATWS6SzbNAslOz1z2tujdKuvRMDAwWMeFXp6dJL1YKRrQjB0WAp0UDGwlFYL7hxw7Fc00QkfxBFsL&apiVersion=2025-01-27.acacia&stripeJsId=45b1eb68-1c89-4758-909d-5410bc100f49&stripeObjId=sobj-d313e62f-9acb-4e9e-87f4-c7d7be5b1c72&firstStripeInstanceCreatedLatency=14&controllerCount=1&isCheckout=false&stripeJsLoadTime=1752773594443&manualBrowserDeprecationRollout=false&mids[guid]=NA&mids[muid]=8e73b563-c89a-46fb-aacf-17b4fb4d0c95a00e1c&mids[sid]=NA&referrer=https%3A%2F%2Freplit.com%2F%40Block2Chainz%2FEmergentProtocolFramework&controllerId=__privateStripeController3521 which is iframe
+injection-topics.js:1 Browsing Topics API removed from https://www.google.com/recaptcha/enterprise/anchor?ar=1&k=6LdqhwwoAAAAAFPdw8jCuvY3PaHQItGj3RzOS4fW&co=aHR0cHM6Ly9yZXBsaXQuY29tOjQ0Mw..&hl=en&v=3jpV4E_UA9gZWYy11LtggjoU&size=invisible&anchor-ms=20000&execute-ms=15000&cb=mn46un2lxmgr which is iframe
+ Browsing Topics API removed from about:blank which is iframe
+EmergentProtocolFramework:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+injection-topics.js:1 Browsing Topics API removed from about:blank which is iframe
+framework-ac314c8a1f58bd6b.js:1 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this error
+framework-ac314c8a1f58bd6b.js:1 Unrecognized feature: 'ambient-light-sensor'.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this warning
+framework-ac314c8a1f58bd6b.js:1 Unrecognized feature: 'battery'.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this warning
+framework-ac314c8a1f58bd6b.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this warning
+framework-ac314c8a1f58bd6b.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this warning
+framework-ac314c8a1f58bd6b.js:1 Unrecognized feature: 'layout-animations'.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this warning
+framework-ac314c8a1f58bd6b.js:1 Unrecognized feature: 'legacy-image-formats'.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this warning
+framework-ac314c8a1f58bd6b.js:1 Unrecognized feature: 'navigation-override'.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this warning
+framework-ac314c8a1f58bd6b.js:1 Unrecognized feature: 'oversized-images'.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this warning
+framework-ac314c8a1f58bd6b.js:1 Unrecognized feature: 'publickey-credentials'.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this warning
+framework-ac314c8a1f58bd6b.js:1 Unrecognized feature: 'speaker-selection'.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this warning
+framework-ac314c8a1f58bd6b.js:1 Unrecognized feature: 'unoptimized-images'.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this warning
+framework-ac314c8a1f58bd6b.js:1 Unrecognized feature: 'unsized-media'.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this warning
+framework-ac314c8a1f58bd6b.js:1 Unrecognized feature: 'pointer-lock'.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this warning
+framework-ac314c8a1f58bd6b.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this warning
+framework-ac314c8a1f58bd6b.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this warning
+ Browsing Topics API removed from https://js.stripe.com/v3/m-outer-3437aaddcdf6922d623e172c2d6f9278.html#url=https%3A%2F%2Freplit.com%2F%40Block2Chainz%2FEmergentProtocolFramework&title=EmergentProtocolFramework%20-%20Replit&referrer=https%3A%2F%2Freplit.com%2F%40Block2Chainz%2FEmergentProtocolFramework&muid=8e73b563-c89a-46fb-aacf-17b4fb4d0c95a00e1c&sid=NA&version=6&preview=false&__shared_params__[version]=acacia which is iframe
+injection-topics.js:1 Browsing Topics API removed from https://m.stripe.network/inner.html#url=https%3A%2F%2Freplit.com%2F%40Block2Chainz%2FEmergentProtocolFramework&title=EmergentProtocolFramework%20-%20Replit&referrer=https%3A%2F%2Freplit.com%2F%40Block2Chainz%2FEmergentProtocolFramework&muid=8e73b563-c89a-46fb-aacf-17b4fb4d0c95a00e1c&sid=NA&version=6&preview=false&__shared_params__[version]=acacia which is iframe
+framework-ac314c8a1f58bd6b.js:1 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this error
+dotdevproxy.janeway.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.janeway.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.janeway.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.kirk.replit.dev/__reachability:1  Failed to load resource: net::ERR_ADDRESS_INVALIDUnderstand this error
+dotdevproxy.kirk.replit.dev/__reachability:1  Failed to load resource: net::ERR_ADDRESS_INVALIDUnderstand this error
+dotdevproxy.kirk.replit.dev/__reachability:1  Failed to load resource: net::ERR_ADDRESS_INVALIDUnderstand this error
+dotdevproxy.picard.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.picard.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.picard.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.pike.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.pike.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.pike.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.riker.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.riker.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.riker.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.sisko.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.sisko.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.sisko.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.spock.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+events.launchdarkly.com/events/diagnostic/62b35a865152ab14c5942820:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENTUnderstand this error
+events.launchdarkly.com/events/diagnostic/62b35a865152ab14c5942820:1  Failed to load resource: net::ERR_BLOCKED_BY_CLIENTUnderstand this error
+dotdevproxy.spock.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.spock.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.wesley.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.wesley.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+framework-ac314c8a1f58bd6b.js:1 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this error
+dotdevproxy.wesley.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.worf.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.worf.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.worf.replit.dev/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.janeway.repl.co/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.janeway.repl.co/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+framework-ac314c8a1f58bd6b.js:1 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+_ @ framework-ac314c8a1f58bd6b.js:1Understand this error
+dotdevproxy.janeway.repl.co/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.kirk.repl.co/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
+dotdevproxy.kirk.repl.co/__reachability:1  Failed to load resource: net::ERR_NAME_NOT_RESOLVEDUnderstand this error
