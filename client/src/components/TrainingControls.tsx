@@ -91,32 +91,32 @@ export function TrainingControls({
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">Status:</span>
             <Badge variant={isRunning ? 'default' : 'secondary'}>
-              <div className={`w-2 h-2 rounded-full mr-2 ${getStatusColor(trainingStatus.experiment.status)}`} />
-              {getStatusText(trainingStatus.experiment.status)}
+              <div className={`w-2 h-2 rounded-full mr-2 ${isRunning ? 'bg-green-500' : 'bg-gray-500'}`} />
+              {isRunning ? 'Running' : 'Idle'}
             </Badge>
           </div>
 
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Episode:</span>
-              <span className="font-medium">{trainingStatus.currentEpisode}</span>
+              <span className="font-medium">{trainingStatus.currentEpisode || 0}</span>
             </div>
             
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Step:</span>
-              <span className="font-medium">{trainingStatus.currentStep}</span>
+              <span className="font-medium">{trainingStatus.currentStep || 0}</span>
             </div>
             
-            {trainingStatus.experiment.config && (
+            {trainingStatus.experiment?.config && (
               <div className="space-y-1">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Progress:</span>
                   <span className="font-medium">
-                    {((trainingStatus.currentEpisode / trainingStatus.experiment.config.total_episodes) * 100).toFixed(1)}%
+                    {((trainingStatus.currentEpisode / (trainingStatus.experiment.config.total_episodes || 1000)) * 100).toFixed(1)}%
                   </span>
                 </div>
                 <Progress 
-                  value={(trainingStatus.currentEpisode / trainingStatus.experiment.config.total_episodes) * 100} 
+                  value={(trainingStatus.currentEpisode / (trainingStatus.experiment.config.total_episodes || 1000)) * 100} 
                 />
               </div>
             )}
@@ -125,7 +125,7 @@ export function TrainingControls({
       )}
 
       {/* Training Configuration */}
-      {trainingStatus?.experiment.config && (
+      {trainingStatus?.experiment?.config && (
         <div className="space-y-2 p-3 bg-muted rounded-lg">
           <div className="flex items-center gap-2 mb-2">
             <Settings className="h-4 w-4 text-muted-foreground" />
@@ -135,19 +135,19 @@ export function TrainingControls({
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div>
               <span className="text-muted-foreground">Episodes:</span>
-              <span className="ml-1 font-medium">{trainingStatus.experiment.config.total_episodes}</span>
+              <span className="ml-1 font-medium">{trainingStatus.experiment.config.total_episodes || 'N/A'}</span>
             </div>
             <div>
               <span className="text-muted-foreground">Learning Rate:</span>
-              <span className="ml-1 font-medium">{trainingStatus.experiment.config.learning_rate}</span>
+              <span className="ml-1 font-medium">{trainingStatus.experiment.config.learning_rate || 'N/A'}</span>
             </div>
             <div>
               <span className="text-muted-foreground">Batch Size:</span>
-              <span className="ml-1 font-medium">{trainingStatus.experiment.config.batch_size}</span>
+              <span className="ml-1 font-medium">{trainingStatus.experiment.config.batch_size || 'N/A'}</span>
             </div>
             <div>
               <span className="text-muted-foreground">Hidden Dim:</span>
-              <span className="ml-1 font-medium">{trainingStatus.experiment.config.hidden_dim}</span>
+              <span className="ml-1 font-medium">{trainingStatus.experiment.config.hidden_dim || 'N/A'}</span>
             </div>
           </div>
         </div>
@@ -167,16 +167,28 @@ export function TrainingControls({
       </div>
 
       {/* Recent Metrics Summary */}
-      {trainingStatus?.recentMetrics && trainingStatus.recentMetrics.length > 0 && (
+      {realtimeMetrics && (
         <div className="p-3 bg-muted rounded-lg">
-          <div className="text-sm font-medium mb-2">Recent Performance</div>
+          <div className="text-sm font-medium mb-2">Real-Time Metrics</div>
           <div className="space-y-1">
-            {trainingStatus.recentMetrics.slice(-3).map((metric, index) => (
-              <div key={index} className="flex justify-between text-xs">
-                <span className="text-muted-foreground">{metric.metricType}:</span>
-                <span className="font-medium">{metric.value.toFixed(3)}</span>
+            {realtimeMetrics.pheromone_strength && (
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">Pheromone Strength:</span>
+                <span className="font-medium">{realtimeMetrics.pheromone_strength.toFixed(3)}</span>
               </div>
-            ))}
+            )}
+            {realtimeMetrics.neural_plasticity && (
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">Neural Plasticity:</span>
+                <span className="font-medium">{realtimeMetrics.neural_plasticity.toFixed(3)}</span>
+              </div>
+            )}
+            {realtimeMetrics.swarm_coordination && (
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">Swarm Coordination:</span>
+                <span className="font-medium">{realtimeMetrics.swarm_coordination.toFixed(3)}</span>
+              </div>
+            )}
           </div>
         </div>
       )}
