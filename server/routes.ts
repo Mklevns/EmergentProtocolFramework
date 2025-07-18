@@ -557,6 +557,185 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Ray RLlib integration routes
+  app.post('/api/training/ray/start', async (req, res) => {
+    try {
+      const { config } = req.body;
+      
+      // Create a new experiment for Ray training
+      const experiment = await storage.createExperiment({
+        name: config?.name || 'Ray RLlib Training',
+        description: config?.description || 'Bio-inspired MARL training with Ray RLlib',
+        status: 'created',
+        config: { ...config, use_ray: true },
+        metrics: {}
+      });
+      
+      // Start Ray training process (with fallback)
+      const pythonPath = path.join(process.cwd(), 'server/services/ray_fallback.py');
+      const pythonProcess = spawn('python3', [pythonPath], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd(),
+        env: { ...process.env, PYTHONPATH: process.cwd() }
+      });
+      
+      // Send Ray training configuration to Python script
+      const rayConfig = {
+        experiment_id: experiment.id,
+        experiment_name: experiment.name,
+        use_ray: true,
+        total_episodes: config?.total_episodes || 100,
+        max_steps_per_episode: config?.max_steps_per_episode || 500,
+        learning_rate: config?.learning_rate || 3e-4,
+        batch_size: config?.batch_size || 128,
+        train_batch_size: config?.train_batch_size || 4000,
+        hidden_dim: config?.hidden_dim || 256,
+        num_rollout_workers: config?.num_rollout_workers || 4,
+        num_attention_heads: config?.num_attention_heads || 8,
+        pheromone_decay: config?.pheromone_decay || 0.95,
+        neural_plasticity_rate: config?.neural_plasticity_rate || 0.1,
+        communication_range: config?.communication_range || 2.0,
+        breakthrough_threshold: config?.breakthrough_threshold || 0.7,
+        agents: await storage.getAllAgents()
+      };
+      
+      pythonProcess.stdin.write(JSON.stringify(rayConfig));
+      pythonProcess.stdin.end();
+      
+      let stdout = '';
+      let stderr = '';
+      
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+        console.log(`Ray Training stdout: ${data}`);
+        
+        // Try to parse and broadcast Ray metrics
+        try {
+          const lines = data.toString().split('\n');
+          for (const line of lines) {
+            if (line.trim().startsWith('{') && line.trim().endsWith('}')) {
+              const metrics = JSON.parse(line.trim());
+              if (metrics.type === 'ray_training_metrics') {
+                broadcast({ type: 'ray_training_metrics', data: metrics });
+              }
+            }
+          }
+        } catch (e) {
+          // Not JSON, just regular log
+          broadcast({ type: 'ray_training_log', data: data.toString() });
+        }
+      });
+      
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+        console.error(`Ray Training stderr: ${data}`);
+        broadcast({ type: 'ray_training_error', data: data.toString() });
+      });
+      
+      pythonProcess.on('close', async (code) => {
+        if (code === 0) {
+          try {
+            const trimmedOutput = stdout.trim();
+            const lastJsonLine = trimmedOutput.split('\n').reverse().find(line => 
+              line.trim().startsWith('{') && line.trim().endsWith('}')
+            );
+            
+            if (lastJsonLine) {
+              const rayResult = JSON.parse(lastJsonLine);
+              
+              if (rayResult.success) {
+                // Update experiment with Ray results
+                await storage.updateExperimentMetrics(experiment.id, rayResult.result.final_metrics);
+                await storage.updateExperimentStatus(experiment.id, 'completed');
+                
+                broadcast({ 
+                  type: 'ray_training_completed', 
+                  data: { 
+                    experimentId: experiment.id, 
+                    metrics: rayResult.result.final_metrics,
+                    trainingMethod: 'ray_rllib'
+                  } 
+                });
+              } else {
+                await storage.updateExperimentStatus(experiment.id, 'failed');
+                broadcast({ type: 'ray_training_failed', data: { experimentId: experiment.id, error: rayResult.error } });
+              }
+            }
+          } catch (parseError) {
+            console.error('Failed to parse Ray training results:', parseError);
+            await storage.updateExperimentStatus(experiment.id, 'failed');
+            broadcast({ type: 'ray_training_failed', data: { experimentId: experiment.id } });
+          }
+        } else {
+          console.error('Ray training process failed:', stderr);
+          await storage.updateExperimentStatus(experiment.id, 'failed');
+          broadcast({ type: 'ray_training_failed', data: { experimentId: experiment.id } });
+        }
+      });
+      
+      await storage.updateExperimentStatus(experiment.id, 'running');
+      broadcast({ type: 'ray_training_started', data: { experimentId: experiment.id } });
+      
+      res.json({ 
+        success: true, 
+        message: 'Ray training started',
+        experimentId: experiment.id,
+        experiment: experiment,
+        trainingMethod: 'ray_rllib'
+      });
+    } catch (error) {
+      console.error('Error starting Ray training:', error);
+      res.status(500).json({ error: 'Failed to start Ray training: ' + error.message });
+    }
+  });
+
+  app.get('/api/training/ray/config-template', async (req, res) => {
+    try {
+      const pythonPath = path.join(process.cwd(), 'server/services/ray_fallback.py');
+      const pythonProcess = spawn('python3', ['-c', `
+import sys
+sys.path.append('${process.cwd()}')
+from server.services.ray_fallback import ray_fallback_system
+import json
+template = ray_fallback_system.create_config_template()
+print(json.dumps(template))
+      `], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd(),
+        env: { ...process.env, PYTHONPATH: process.cwd() }
+      });
+      
+      let stdout = '';
+      let stderr = '';
+      
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+      
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+      
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const template = JSON.parse(stdout.trim());
+            res.json(template);
+          } catch (parseError) {
+            console.error('Failed to parse Ray config template:', parseError);
+            res.status(500).json({ error: 'Failed to parse Ray config template' });
+          }
+        } else {
+          console.error('Ray config template generation failed:', stderr);
+          res.status(500).json({ error: 'Failed to generate Ray config template' });
+        }
+      });
+    } catch (error) {
+      console.error('Error generating Ray config template:', error);
+      res.status(500).json({ error: 'Failed to generate Ray config template' });
+    }
+  });
+
   app.post('/api/training/start', async (req, res) => {
     try {
       const { experimentId, config } = req.body;

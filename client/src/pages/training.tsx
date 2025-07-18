@@ -31,6 +31,22 @@ export default function Training() {
     breakthrough_threshold: 0.7,
   });
   
+  const [rayConfig, setRayConfig] = useState({
+    name: "",
+    description: "",
+    total_episodes: 100,
+    learning_rate: 0.0003,
+    batch_size: 128,
+    train_batch_size: 4000,
+    hidden_dim: 256,
+    num_rollout_workers: 4,
+    num_attention_heads: 8,
+    pheromone_decay: 0.95,
+    neural_plasticity_rate: 0.1,
+    communication_range: 2.0,
+    breakthrough_threshold: 0.7,
+  });
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -39,18 +55,35 @@ export default function Training() {
   
   // Handle WebSocket training updates
   useEffect(() => {
-    if (wsData?.type === 'training_started') {
+    if (wsData?.type === 'training_started' || wsData?.type === 'ray_training_started') {
       queryClient.invalidateQueries({ queryKey: ['/api/experiments'] });
       queryClient.invalidateQueries({ queryKey: ['/api/training/status'] });
     }
-    if (wsData?.type === 'training_metrics') {
+    if (wsData?.type === 'training_metrics' || wsData?.type === 'ray_training_metrics') {
       queryClient.invalidateQueries({ queryKey: ['/api/training/status'] });
     }
-    if (wsData?.type === 'training_completed' || wsData?.type === 'training_failed') {
+    if (wsData?.type === 'training_completed' || wsData?.type === 'training_failed' || 
+        wsData?.type === 'ray_training_completed' || wsData?.type === 'ray_training_failed') {
       queryClient.invalidateQueries({ queryKey: ['/api/experiments'] });
       queryClient.invalidateQueries({ queryKey: ['/api/training/status'] });
+      
+      // Show completion toast
+      if (wsData?.type === 'training_completed' || wsData?.type === 'ray_training_completed') {
+        toast({
+          title: "Training Completed",
+          description: wsData?.type === 'ray_training_completed' ? 
+            "Ray RLlib training completed successfully!" : 
+            "Training completed successfully!",
+        });
+      } else if (wsData?.type === 'training_failed' || wsData?.type === 'ray_training_failed') {
+        toast({
+          title: "Training Failed",
+          description: "Training session encountered an error.",
+          variant: "destructive",
+        });
+      }
     }
-  }, [wsData, queryClient]);
+  }, [wsData, queryClient, toast]);
   
   // Experiments query
   const { data: experiments, isLoading: experimentsLoading } = useQuery<Experiment[]>({
@@ -116,6 +149,53 @@ export default function Training() {
       toast({
         title: "Error",
         description: `Failed to start training: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Ray training mutations
+  const rayConfigTemplateMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('GET', '/api/training/ray/config-template');
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        setRayConfig(data.config_template);
+        toast({
+          title: "Ray Config Loaded",
+          description: "Ray RLlib configuration template loaded successfully.",
+        });
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to load Ray config: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const startRayTrainingMutation = useMutation({
+    mutationFn: async (config: any) => {
+      const response = await apiRequest('POST', '/api/training/ray/start', { config });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/experiments'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/training/status'] });
+      setSelectedExperiment(data.experimentId);
+      toast({
+        title: "Ray Training Started",
+        description: "Ray RLlib training has been started successfully.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to start Ray training: ${error.message}`,
         variant: "destructive",
       });
     },
@@ -344,16 +424,178 @@ export default function Training() {
               <CardTitle>Training Controls</CardTitle>
             </CardHeader>
             <CardContent>
-              <TrainingControls
-                experimentId={selectedExperiment}
-                trainingStatus={trainingStatus}
-                onStart={handleStartTraining}
-                onQuickStart={handleQuickStart}
-                onStop={handleStopTraining}
-                isStarting={startTrainingMutation.isPending}
-                isStopping={stopTrainingMutation.isPending}
-                realtimeMetrics={wsData}
-              />
+              <Tabs defaultValue="standard" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="standard">Standard Training</TabsTrigger>
+                  <TabsTrigger value="ray">Ray RLlib Training</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="standard" className="space-y-4">
+                  <TrainingControls
+                    experimentId={selectedExperiment}
+                    trainingStatus={trainingStatus}
+                    onStart={handleStartTraining}
+                    onQuickStart={handleQuickStart}
+                    onStop={handleStopTraining}
+                    isStarting={startTrainingMutation.isPending}
+                    isStopping={stopTrainingMutation.isPending}
+                    realtimeMetrics={wsData}
+                  />
+                </TabsContent>
+                
+                <TabsContent value="ray" className="space-y-4">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold">Ray RLlib Training</h3>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => rayConfigTemplateMutation.mutate()}
+                          disabled={rayConfigTemplateMutation.isPending}
+                        >
+                          <FileText className="h-4 w-4 mr-2" />
+                          Load Template
+                        </Button>
+                        <Button 
+                          onClick={() => startRayTrainingMutation.mutate(rayConfig)}
+                          disabled={startRayTrainingMutation.isPending}
+                        >
+                          <Play className="h-4 w-4 mr-2" />
+                          Start Ray Training
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="ray_name">Experiment Name</Label>
+                        <Input
+                          id="ray_name"
+                          value={rayConfig.name}
+                          onChange={(e) => setRayConfig(prev => ({ ...prev, name: e.target.value }))}
+                          placeholder="Ray RLlib Experiment"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="ray_episodes">Episodes</Label>
+                        <Input
+                          id="ray_episodes"
+                          type="number"
+                          value={rayConfig.total_episodes}
+                          onChange={(e) => setRayConfig(prev => ({ ...prev, total_episodes: parseInt(e.target.value) }))}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="ray_lr">Learning Rate</Label>
+                        <Input
+                          id="ray_lr"
+                          type="number"
+                          step="0.0001"
+                          value={rayConfig.learning_rate}
+                          onChange={(e) => setRayConfig(prev => ({ ...prev, learning_rate: parseFloat(e.target.value) }))}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="ray_workers">Rollout Workers</Label>
+                        <Input
+                          id="ray_workers"
+                          type="number"
+                          value={rayConfig.num_rollout_workers}
+                          onChange={(e) => setRayConfig(prev => ({ ...prev, num_rollout_workers: parseInt(e.target.value) }))}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="ray_batch">Batch Size</Label>
+                        <Input
+                          id="ray_batch"
+                          type="number"
+                          value={rayConfig.batch_size}
+                          onChange={(e) => setRayConfig(prev => ({ ...prev, batch_size: parseInt(e.target.value) }))}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="ray_train_batch">Train Batch Size</Label>
+                        <Input
+                          id="ray_train_batch"
+                          type="number"
+                          value={rayConfig.train_batch_size}
+                          onChange={(e) => setRayConfig(prev => ({ ...prev, train_batch_size: parseInt(e.target.value) }))}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="ray_hidden">Hidden Dimension</Label>
+                        <Input
+                          id="ray_hidden"
+                          type="number"
+                          value={rayConfig.hidden_dim}
+                          onChange={(e) => setRayConfig(prev => ({ ...prev, hidden_dim: parseInt(e.target.value) }))}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="ray_attention">Attention Heads</Label>
+                        <Input
+                          id="ray_attention"
+                          type="number"
+                          value={rayConfig.num_attention_heads}
+                          onChange={(e) => setRayConfig(prev => ({ ...prev, num_attention_heads: parseInt(e.target.value) }))}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="ray_pheromone">Pheromone Decay</Label>
+                        <Input
+                          id="ray_pheromone"
+                          type="number"
+                          step="0.01"
+                          value={rayConfig.pheromone_decay}
+                          onChange={(e) => setRayConfig(prev => ({ ...prev, pheromone_decay: parseFloat(e.target.value) }))}
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="ray_plasticity">Neural Plasticity Rate</Label>
+                        <Input
+                          id="ray_plasticity"
+                          type="number"
+                          step="0.01"
+                          value={rayConfig.neural_plasticity_rate}
+                          onChange={(e) => setRayConfig(prev => ({ ...prev, neural_plasticity_rate: parseFloat(e.target.value) }))}
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="ray_description">Description</Label>
+                      <Textarea
+                        id="ray_description"
+                        value={rayConfig.description}
+                        onChange={(e) => setRayConfig(prev => ({ ...prev, description: e.target.value }))}
+                        placeholder="Ray RLlib training with bio-inspired features"
+                      />
+                    </div>
+                    
+                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                      <h4 className="font-semibold text-blue-900 dark:text-blue-100">Ray RLlib Features</h4>
+                      <ul className="text-sm text-blue-800 dark:text-blue-200 mt-2 space-y-1">
+                        <li>• Distributed multi-worker training</li>
+                        <li>• Production-ready Algorithm and Learner classes</li>
+                        <li>• Bio-inspired neural networks with attention mechanisms</li>
+                        <li>• Automatic checkpointing and evaluation</li>
+                        <li>• Enhanced 3D environment with pheromone trails</li>
+                        <li>• Real-time metrics and breakthrough detection</li>
+                      </ul>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
           
