@@ -20,6 +20,7 @@ import {
 import { AgentGrid3D } from '@/components/AgentGrid3D';
 import { CommunicationFlow } from '@/components/CommunicationFlow';
 import { MemoryVisualization } from '@/components/MemoryVisualization';
+import { EnhancedCommunicationPanel } from '@/components/EnhancedCommunicationPanel';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { AgentGridData } from '@/lib/agent-types';
 
@@ -225,6 +226,15 @@ export default function Visualization() {
                 <Database className="h-4 w-4 mr-2" />
                 Memory Visualization
               </Button>
+              
+              <Button
+                variant={selectedView === 'enhanced' ? 'default' : 'outline'}
+                className="w-full justify-start"
+                onClick={() => setSelectedView('enhanced')}
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Enhanced Systems
+              </Button>
             </CardContent>
           </Card>
 
@@ -395,6 +405,17 @@ export default function Visualization() {
                   memoryState={memoryState}
                   agents={gridData?.agents || []}
                 />
+              </CardContent>
+            </Card>
+          )}
+
+          {selectedView === 'enhanced' && (
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle>Enhanced Communication & Memory Systems</CardTitle>
+              </CardHeader>
+              <CardContent className="flex-1 overflow-auto">
+                <EnhancedCommunicationPanel />
               </CardContent>
             </Card>
           )}

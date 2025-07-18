@@ -923,6 +923,267 @@ print(json.dumps(template))
     }
   });
 
+  // Enhanced Communication & Memory APIs
+  app.get('/api/communication/enhanced-stats', async (req, res) => {
+    try {
+      const pythonPath = path.join(process.cwd(), 'server/services/enhanced_api.py');
+      const pythonProcess = spawn('python3', [pythonPath, 'get_enhanced_communication_stats'], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd(),
+        env: { ...process.env, PYTHONPATH: process.cwd() }
+      });
+
+      let stdout = '';
+      let stderr = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdout.trim());
+            res.json(result);
+          } catch (parseError) {
+            res.status(500).json({ error: 'Failed to parse enhanced communication stats' });
+          }
+        } else {
+          console.error('Enhanced communication stats error:', stderr);
+          res.status(500).json({ error: 'Failed to get enhanced communication statistics' });
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch enhanced communication stats' });
+    }
+  });
+
+  app.get('/api/memory/advanced-stats', async (req, res) => {
+    try {
+      const pythonPath = path.join(process.cwd(), 'server/services/enhanced_api.py');
+      const pythonProcess = spawn('python3', [pythonPath, 'get_advanced_memory_stats'], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd(),
+        env: { ...process.env, PYTHONPATH: process.cwd() }
+      });
+
+      let stdout = '';
+      let stderr = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdout.trim());
+            res.json(result);
+          } catch (parseError) {
+            res.status(500).json({ error: 'Failed to parse advanced memory stats' });
+          }
+        } else {
+          console.error('Advanced memory stats error:', stderr);
+          res.status(500).json({ error: 'Failed to get advanced memory statistics' });
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch advanced memory stats' });
+    }
+  });
+
+  app.post('/api/memory/query-semantic', async (req, res) => {
+    try {
+      const { query_text, max_results = 10, threshold = 0.7 } = req.body;
+      
+      const pythonPath = path.join(process.cwd(), 'server/services/enhanced_api.py');
+      const pythonProcess = spawn('python3', [pythonPath, 'semantic_memory_query'], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd(),
+        env: { ...process.env, PYTHONPATH: process.cwd() }
+      });
+
+      const queryData = {
+        query_text,
+        max_results,
+        threshold
+      };
+
+      pythonProcess.stdin.write(JSON.stringify(queryData));
+      pythonProcess.stdin.end();
+
+      let stdout = '';
+      let stderr = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdout.trim());
+            res.json(result);
+          } catch (parseError) {
+            res.status(500).json({ error: 'Failed to parse semantic query results' });
+          }
+        } else {
+          console.error('Semantic query error:', stderr);
+          res.status(500).json({ error: 'Failed to execute semantic memory query' });
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to process semantic memory query' });
+    }
+  });
+
+  app.post('/api/memory/query-associative', async (req, res) => {
+    try {
+      const { vector_id, max_depth = 3, max_results = 15 } = req.body;
+      
+      const pythonPath = path.join(process.cwd(), 'server/services/enhanced_api.py');
+      const pythonProcess = spawn('python3', [pythonPath, 'associative_memory_query'], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd(),
+        env: { ...process.env, PYTHONPATH: process.cwd() }
+      });
+
+      const queryData = {
+        vector_id,
+        max_depth,
+        max_results
+      };
+
+      pythonProcess.stdin.write(JSON.stringify(queryData));
+      pythonProcess.stdin.end();
+
+      let stdout = '';
+      let stderr = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdout.trim());
+            res.json(result);
+          } catch (parseError) {
+            res.status(500).json({ error: 'Failed to parse associative query results' });
+          }
+        } else {
+          console.error('Associative query error:', stderr);
+          res.status(500).json({ error: 'Failed to execute associative memory query' });
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to process associative memory query' });
+    }
+  });
+
+  app.get('/api/communication/bandwidth-usage', async (req, res) => {
+    try {
+      const pythonPath = path.join(process.cwd(), 'server/services/enhanced_api.py');
+      const pythonProcess = spawn('python3', [pythonPath, 'get_bandwidth_usage'], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd(),
+        env: { ...process.env, PYTHONPATH: process.cwd() }
+      });
+
+      let stdout = '';
+      let stderr = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdout.trim());
+            res.json(result);
+          } catch (parseError) {
+            res.status(500).json({ error: 'Failed to parse bandwidth usage data' });
+          }
+        } else {
+          console.error('Bandwidth usage error:', stderr);
+          res.status(500).json({ error: 'Failed to get bandwidth usage statistics' });
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch bandwidth usage data' });
+    }
+  });
+
+  app.post('/api/memory/predictive-prefetch', async (req, res) => {
+    try {
+      const { access_sequence, max_predictions = 5 } = req.body;
+      
+      const pythonPath = path.join(process.cwd(), 'server/services/enhanced_api.py');
+      const pythonProcess = spawn('python3', [pythonPath, 'predictive_prefetch'], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd(),
+        env: { ...process.env, PYTHONPATH: process.cwd() }
+      });
+
+      const queryData = {
+        access_sequence,
+        max_predictions
+      };
+
+      pythonProcess.stdin.write(JSON.stringify(queryData));
+      pythonProcess.stdin.end();
+
+      let stdout = '';
+      let stderr = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdout.trim());
+            res.json(result);
+          } catch (parseError) {
+            res.status(500).json({ error: 'Failed to parse predictive prefetch results' });
+          }
+        } else {
+          console.error('Predictive prefetch error:', stderr);
+          res.status(500).json({ error: 'Failed to execute predictive prefetching' });
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to process predictive prefetch request' });
+    }
+  });
+
   // Initialize demo data
   app.post('/api/initialize-demo', async (req, res) => {
     try {

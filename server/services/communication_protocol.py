@@ -18,6 +18,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from .shared_memory import SharedMemorySystem, VectorType, get_shared_memory
 from .agent_network import AgentNetworkManager, get_network_manager
+from .advanced_communication import EnhancedCommunicationProtocol, get_enhanced_communication_protocol
 
 logger = logging.getLogger(__name__)
 

@@ -7,10 +7,11 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import Dict, List, Optional, Tuple, Any, Union
+from typing import Dict, List, Optional, Tuple, Any, Union, Set
 import uuid
 import json
 import logging
+import math
 from dataclasses import dataclass, asdict
 from enum import Enum
 import time
@@ -152,10 +153,22 @@ class SharedMemorySystem:
         self.memory_vectors: Dict[str, MemoryVector] = {}
         self.memory_pointers: Dict[str, MemoryPointer] = {}
         
-        # Indexing structures
+        # Enhanced indexing structures
         self.spatial_index: Dict[Tuple[int, int, int], List[str]] = defaultdict(list)
         self.type_index: Dict[VectorType, List[str]] = defaultdict(list)
         self.access_queue: deque = deque(maxlen=max_vectors)
+        
+        # Advanced indexing for sophisticated retrieval
+        self.importance_index: Dict[str, List[str]] = defaultdict(list)  # 'high', 'medium', 'low'
+        self.temporal_index: Dict[str, List[str]] = defaultdict(list)   # Time-based buckets
+        self.tag_index: Dict[str, List[str]] = defaultdict(list)        # Tag-based indexing
+        self.association_graph: Dict[str, Set[str]] = defaultdict(set)  # Associative connections
+        self.concept_hierarchy: Dict[str, Dict[str, float]] = defaultdict(dict)  # Concept relationships
+        
+        # Advanced access pattern tracking
+        self.access_sequences: deque = deque(maxlen=1000)  # Track access sequences
+        self.co_access_patterns: Dict[Tuple[str, str], int] = defaultdict(int)  # Co-occurrence tracking
+        self.prediction_cache: Dict[str, List[str]] = {}  # Predictive prefetching
         
         # Compression system
         compressed_dim = int(vector_dim * compression_ratio)
@@ -170,22 +183,30 @@ class SharedMemorySystem:
         self.cleanup_thread = None
         self.executor = ThreadPoolExecutor(max_workers=4)
         
-        # Statistics
+        # Enhanced statistics
         self.stats = {
             'total_stores': 0,
             'total_retrievals': 0,
             'cache_hits': 0,
             'cache_misses': 0,
             'compression_ratio': 0.0,
-            'average_access_time': 0.0
+            'average_access_time': 0.0,
+            'prediction_accuracy': 0.0,
+            'index_efficiency': 0.0,
+            'associative_retrievals': 0,
+            'temporal_retrievals': 0,
+            'spatial_retrievals': 0
         }
         
-        # Vector similarity cache
+        # Vector similarity cache with enhanced management
         self.similarity_cache: Dict[str, Dict[str, float]] = {}
+        self.cache_access_times: Dict[str, float] = {}
+        self.cache_max_size = 10000
+        self.cache_ttl = 3600  # 1 hour TTL
         
         self._start_cleanup_thread()
         
-        logger.info(f"SharedMemorySystem initialized with {max_vectors} capacity")
+        logger.info(f"Enhanced SharedMemorySystem initialized with {max_vectors} capacity")
     
     def _start_cleanup_thread(self):
         """Start background cleanup thread"""
@@ -485,6 +506,279 @@ class SharedMemorySystem:
                 self._remove_vector(vector_id)
                 logger.debug(f"Removed expired vector {vector_id}")
     
+    def retrieve_by_importance_ranking(self, min_importance: float = 0.5, max_results: int = 20) -> List[Tuple[str, float]]:
+        """Retrieve vectors ranked by importance with sophisticated scoring"""
+        
+        with self.memory_lock:
+            results = []
+            current_time = time.time()
+            
+            for vector_id, memory_vector in self.memory_vectors.items():
+                if memory_vector.importance < min_importance or memory_vector.is_expired():
+                    continue
+                
+                # Calculate dynamic importance score
+                age_factor = 1.0 / (1.0 + (current_time - memory_vector.created_at) / 86400)  # Days
+                recency_factor = 1.0 / (1.0 + (current_time - memory_vector.last_accessed) / 3600)  # Hours
+                access_frequency = memory_vector.access_count / max(1, len(self.access_history.get(vector_id, [1])))
+                
+                dynamic_score = (
+                    memory_vector.importance * 0.4 +
+                    age_factor * 0.2 +
+                    recency_factor * 0.2 +
+                    min(access_frequency, 1.0) * 0.2
+                )
+                
+                results.append((vector_id, dynamic_score))
+            
+            # Sort by dynamic score and return top results
+            results.sort(key=lambda x: x[1], reverse=True)
+            self.stats['importance_retrievals'] = self.stats.get('importance_retrievals', 0) + 1
+            return results[:max_results]
+    
+    def retrieve_by_temporal_locality(self, time_window: float = 3600, pattern_type: str = "recent") -> List[str]:
+        """Retrieve vectors based on temporal access patterns"""
+        
+        with self.memory_lock:
+            current_time = time.time()
+            results = []
+            
+            if pattern_type == "recent":
+                # Get recently accessed vectors
+                for vector_id, memory_vector in self.memory_vectors.items():
+                    if current_time - memory_vector.last_accessed <= time_window:
+                        results.append(vector_id)
+            
+            elif pattern_type == "periodic":
+                # Detect periodic access patterns
+                for vector_id, access_times in self.access_history.items():
+                    if len(access_times) >= 3:
+                        intervals = np.diff(access_times)
+                        if np.std(intervals) < 0.2 * np.mean(intervals):  # Low variance indicates periodicity
+                            results.append(vector_id)
+            
+            elif pattern_type == "bursty":
+                # Detect bursty access patterns
+                for vector_id, access_times in self.access_history.items():
+                    if len(access_times) >= 3:
+                        recent_accesses = [t for t in access_times if current_time - t <= time_window]
+                        if len(recent_accesses) >= 3:  # Multiple accesses in window
+                            results.append(vector_id)
+            
+            self.stats['temporal_retrievals'] = self.stats.get('temporal_retrievals', 0) + 1
+            return results
+    
+    def retrieve_by_associative_connections(self, seed_vector_id: str, max_depth: int = 3, max_results: int = 15) -> List[Tuple[str, float]]:
+        """Retrieve vectors through associative connections with relevance scoring"""
+        
+        with self.memory_lock:
+            if seed_vector_id not in self.memory_vectors:
+                return []
+            
+            visited = set()
+            queue = deque([(seed_vector_id, 1.0, 0)])  # (vector_id, relevance_score, depth)
+            results = []
+            
+            while queue and len(results) < max_results:
+                current_id, relevance, depth = queue.popleft()
+                
+                if current_id in visited or depth >= max_depth:
+                    continue
+                
+                visited.add(current_id)
+                if current_id != seed_vector_id:
+                    results.append((current_id, relevance))
+                
+                # Find associated vectors through various connections
+                associated = set()
+                
+                # 1. Direct associations in graph
+                associated.update(self.association_graph.get(current_id, set()))
+                
+                # 2. Co-access patterns
+                for (vec1, vec2), count in self.co_access_patterns.items():
+                    if vec1 == current_id and count >= 3:
+                        associated.add(vec2)
+                    elif vec2 == current_id and count >= 3:
+                        associated.add(vec1)
+                
+                # 3. Spatial proximity
+                if current_id in self.memory_vectors:
+                    current_coords = self.memory_vectors[current_id].coordinates
+                    for coords, vector_ids in self.spatial_index.items():
+                        if self._spatial_distance(current_coords, coords) <= 2:
+                            associated.update(vector_ids)
+                
+                # Add to queue with reduced relevance
+                decay_factor = 0.7
+                for assoc_id in associated:
+                    if assoc_id not in visited:
+                        queue.append((assoc_id, relevance * decay_factor, depth + 1))
+            
+            # Sort by relevance
+            results.sort(key=lambda x: x[1], reverse=True)
+            self.stats['associative_retrievals'] = self.stats.get('associative_retrievals', 0) + 1
+            return results
+    
+    def retrieve_by_concept_hierarchy(self, concept: str, max_results: int = 10) -> List[Tuple[str, float]]:
+        """Retrieve vectors based on concept hierarchy relationships"""
+        
+        with self.memory_lock:
+            results = []
+            
+            # Find vectors with matching tags or types
+            candidate_vectors = set()
+            
+            # Direct concept matches
+            if concept in self.tag_index:
+                candidate_vectors.update(self.tag_index[concept])
+            
+            # Check for VectorType match
+            for vector_type in VectorType:
+                if vector_type.value == concept:
+                    candidate_vectors.update(self.type_index[vector_type])
+            
+            # Hierarchical concept matches
+            if concept in self.concept_hierarchy:
+                for related_concept, strength in self.concept_hierarchy[concept].items():
+                    if strength >= 0.5:  # Threshold for relevance
+                        if related_concept in self.tag_index:
+                            candidate_vectors.update(self.tag_index[related_concept])
+            
+            # Score candidates
+            for vector_id in candidate_vectors:
+                if vector_id not in self.memory_vectors:
+                    continue
+                
+                memory_vector = self.memory_vectors[vector_id]
+                score = 0.0
+                
+                # Direct match bonus
+                if concept in memory_vector.tags or concept == memory_vector.vector_type.value:
+                    score += 1.0
+                
+                # Hierarchical relationship bonus
+                if concept in self.concept_hierarchy:
+                    for tag in memory_vector.tags:
+                        if tag in self.concept_hierarchy[concept]:
+                            score += self.concept_hierarchy[concept][tag] * 0.5
+                
+                # Importance bonus
+                score += memory_vector.importance * 0.3
+                
+                if score > 0:
+                    results.append((vector_id, score))
+            
+            # Sort and limit results
+            results.sort(key=lambda x: x[1], reverse=True)
+            return results[:max_results]
+    
+    def predictive_prefetch(self, recent_access_sequence: List[str], max_predictions: int = 5) -> List[str]:
+        """Predict and prefetch likely next memory accesses"""
+        
+        with self.memory_lock:
+            if len(recent_access_sequence) < 2:
+                return []
+            
+            predictions = defaultdict(float)
+            
+            # Pattern 1: Sequential pattern detection
+            for i in range(len(recent_access_sequence) - 1):
+                current = recent_access_sequence[i]
+                next_item = recent_access_sequence[i + 1]
+                
+                # Look for this pattern in access sequences
+                for j in range(len(self.access_sequences) - 1):
+                    if (self.access_sequences[j] == current and 
+                        self.access_sequences[j + 1] == next_item):
+                        
+                        # Predict the item after the pattern
+                        if j + 2 < len(self.access_sequences):
+                            predicted = self.access_sequences[j + 2]
+                            predictions[predicted] += 1.0
+            
+            # Pattern 2: Co-access pattern prediction
+            last_accessed = recent_access_sequence[-1]
+            for (vec1, vec2), count in self.co_access_patterns.items():
+                if vec1 == last_accessed:
+                    predictions[vec2] += count / 10.0  # Normalize co-access strength
+                elif vec2 == last_accessed:
+                    predictions[vec1] += count / 10.0
+            
+            # Pattern 3: Associative prediction
+            for assoc_id in self.association_graph.get(last_accessed, set()):
+                predictions[assoc_id] += 0.5
+            
+            # Sort predictions and return top candidates
+            sorted_predictions = sorted(predictions.items(), key=lambda x: x[1], reverse=True)
+            
+            # Update prediction accuracy metrics
+            if hasattr(self, '_last_predictions'):
+                hits = sum(1 for pred in self._last_predictions if pred in recent_access_sequence[-3:])
+                accuracy = hits / max(1, len(self._last_predictions))
+                self.stats['prediction_accuracy'] = 0.9 * self.stats['prediction_accuracy'] + 0.1 * accuracy
+            
+            predicted_vectors = [pred[0] for pred in sorted_predictions[:max_predictions]]
+            self._last_predictions = predicted_vectors  # Store for accuracy calculation
+            
+            return predicted_vectors
+    
+    def _spatial_distance(self, coords1: Tuple[int, int, int], coords2: Tuple[int, int, int]) -> float:
+        """Calculate spatial distance between two coordinate points"""
+        return math.sqrt(sum((a - b) ** 2 for a, b in zip(coords1, coords2)))
+    
+    def _update_access_patterns(self, vector_id: str):
+        """Update sophisticated access pattern tracking"""
+        
+        current_time = time.time()
+        
+        # Update access sequence
+        self.access_sequences.append(vector_id)
+        
+        # Update co-access patterns
+        if len(self.access_sequences) >= 2:
+            prev_access = self.access_sequences[-2]
+            self.co_access_patterns[(prev_access, vector_id)] += 1
+        
+        # Update association graph based on recent accesses
+        recent_window = list(self.access_sequences)[-5:]  # Last 5 accesses
+        for other_id in recent_window:
+            if other_id != vector_id:
+                self.association_graph[vector_id].add(other_id)
+                self.association_graph[other_id].add(vector_id)
+        
+        # Update concept hierarchy
+        if vector_id in self.memory_vectors:
+            self._update_concept_relationships(vector_id)
+    
+    def _update_concept_relationships(self, vector_id: str):
+        """Update concept hierarchy based on access patterns"""
+        
+        memory_vector = self.memory_vectors[vector_id]
+        concepts = [memory_vector.vector_type.value] + memory_vector.tags
+        
+        # Strengthen relationships between co-occurring concepts
+        for i, concept1 in enumerate(concepts):
+            for j, concept2 in enumerate(concepts):
+                if i != j:
+                    if concept2 not in self.concept_hierarchy[concept1]:
+                        self.concept_hierarchy[concept1][concept2] = 0.0
+                    
+                    # Strengthen relationship
+                    self.concept_hierarchy[concept1][concept2] = min(1.0, 
+                        self.concept_hierarchy[concept1][concept2] + 0.05)
+    
+    def _categorize_importance(self, importance: float) -> str:
+        """Categorize importance level for indexing"""
+        if importance >= 0.8:
+            return "critical"
+        elif importance >= 0.6:
+            return "high"
+        elif importance >= 0.4:
+            return "medium"
+        else:
+            return "low"
+    
     def get_memory_statistics(self) -> Dict[str, Any]:
         """Get comprehensive memory statistics"""
         
@@ -502,6 +796,11 @@ class SharedMemorySystem:
             compressed_count = sum(1 for v in self.memory_vectors.values() if v.content.numel() != self.vector_dim)
             compression_efficiency = compressed_count / max(1, len(self.memory_vectors))
             
+            # Advanced statistics
+            importance_distribution = {}
+            for importance_level in ["critical", "high", "medium", "low"]:
+                importance_distribution[importance_level] = len(self.importance_index[importance_level])
+            
             return {
                 'total_vectors': len(self.memory_vectors),
                 'total_pointers': len(self.memory_pointers),
@@ -510,12 +809,19 @@ class SharedMemorySystem:
                 'total_memory_size': total_size,
                 'average_vector_size': total_size / max(1, len(self.memory_vectors)),
                 'type_distribution': type_distribution,
+                'importance_distribution': importance_distribution,
                 'average_importance': avg_importance,
                 'compression_efficiency': compression_efficiency,
                 'cache_hit_ratio': self.stats['cache_hits'] / max(1, self.stats['total_retrievals']),
                 'average_access_time': self.stats['average_access_time'],
                 'spatial_localities': len(self.spatial_index),
-                'access_patterns': {k: v.value for k, v in self.access_patterns.items()}
+                'temporal_buckets': len(self.temporal_index),
+                'tag_categories': len(self.tag_index),
+                'association_connections': sum(len(assocs) for assocs in self.association_graph.values()),
+                'co_access_patterns': len(self.co_access_patterns),
+                'concept_relationships': len(self.concept_hierarchy),
+                'access_patterns': {k: v.value for k, v in self.access_patterns.items()},
+                'advanced_stats': dict(self.stats)
             }
     
     def get_visualization_data(self) -> Dict[str, Any]:
