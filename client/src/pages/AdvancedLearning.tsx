@@ -24,61 +24,67 @@ import {
 import { apiRequest } from '@/lib/queryClient';
 
 interface AdvancedLearningStatus {
-  initialized: boolean;
-  learning_mode: string;
-  is_training: boolean;
-  current_phase: string;
-  enabled_features: {
-    curriculum_learning: boolean;
-    transfer_learning: boolean;
-    meta_learning: boolean;
+  success: boolean;
+  status: {
+    curriculum: {
+      enabled: boolean;
+      stage: string;
+      progress: number;
+    };
+    transfer: {
+      enabled: boolean;
+      models_available: number;
+      compatibility: number;
+    };
+    meta: {
+      enabled: boolean;
+      adaptation_rate: number;
+      tasks_completed: number;
+    };
   };
-  curriculum_status?: any;
-  transfer_status?: any;
-  meta_status?: any;
+  metrics: {
+    curriculum_progress: number;
+    transfer_efficiency: number;
+    meta_adaptation_speed: number;
+    overall_performance: number;
+  };
+  timestamp: number;
 }
 
 interface CurriculumProgress {
-  enabled: boolean;
-  current_stage?: {
-    name: string;
-    index: number;
-    total_stages: number;
-    difficulty: number;
-    episodes_completed: number;
-    episodes_target: number;
-  };
-  performance?: {
-    mastery_score: number;
+  success: boolean;
+  current_stage: string;
+  stage_index: number;
+  total_stages: number;
+  progress: number;
+  metrics: {
+    completion_rate: number;
     success_threshold: number;
-    ready_to_advance: boolean;
+    adaptive_difficulty: boolean;
   };
 }
 
 interface TransferRecommendations {
-  enabled: boolean;
-  recommendations: Array<{
-    source_experiment: string;
-    compatibility_score: number;
-    recommended_components: string[];
-    expected_benefit: {
-      training_speedup: number;
-      final_performance_boost: number;
-      convergence_episodes: number;
-    };
+  success: boolean;
+  available_models: Array<{
+    name: string;
+    compatibility: number;
+    performance_gain: number;
+    transfer_components: string[];
   }>;
-  available_models: number;
+  recommendations: string[];
 }
 
 interface MetaInsights {
-  enabled: boolean;
-  insights?: {
-    total_adaptations: number;
-    average_adaptation_time: number;
-    average_performance_improvement: number;
-    adaptation_success_rate: number;
+  success: boolean;
+  adaptation_metrics: {
+    learning_rate: number;
+    few_shot_performance: number;
+    generalization_score: number;
+    meta_optimization_steps: number;
   };
-  recommendations?: string[];
+  insights: string[];
+  recommendations: string[];
 }
 
 export default function AdvancedLearning() {
@@ -94,20 +100,20 @@ export default function AdvancedLearning() {
   // Fetch curriculum progress
   const { data: curriculumProgress } = useQuery<CurriculumProgress>({
     queryKey: ['/api/advanced/curriculum_progress'],
-    enabled: status?.enabled_features?.curriculum_learning,
+    enabled: status?.status?.curriculum?.enabled,
     refetchInterval: 3000
   });
 
   // Fetch transfer recommendations
   const { data: transferRecommendations } = useQuery<TransferRecommendations>({
     queryKey: ['/api/advanced/transfer_recommendations'],
-    enabled: status?.enabled_features?.transfer_learning
+    enabled: status?.status?.transfer?.enabled
   });
 
   // Fetch meta-learning insights
   const { data: metaInsights } = useQuery<MetaInsights>({
     queryKey: ['/api/advanced/meta_insights'],
-    enabled: status?.enabled_features?.meta_learning,
+    enabled: status?.status?.meta?.enabled,
     refetchInterval: 5000
   });
 
@@ -229,7 +235,7 @@ export default function AdvancedLearning() {
           </p>
         </div>
         <div className="flex gap-2">
-          {!status?.initialized ? (
+          {!status?.success ? (
             <Button 
               onClick={handleInitialize}
               disabled={initializeMutation.isPending}
@@ -241,20 +247,11 @@ export default function AdvancedLearning() {
           ) : (
             <Button 
               onClick={handleStartTraining}
-              disabled={startTrainingMutation.isPending || status?.is_training}
+              disabled={startTrainingMutation.isPending}
               className="flex items-center gap-2"
             >
-              {status?.is_training ? (
-                <>
-                  <Pause className="h-4 w-4" />
-                  Training Active
-                </>
-              ) : (
-                <>
-                  <Play className="h-4 w-4" />
-                  {startTrainingMutation.isPending ? 'Starting...' : 'Start Advanced Training'}
-                </>
-              )}
+              <Play className="h-4 w-4" />
+              {startTrainingMutation.isPending ? 'Starting...' : 'Start Advanced Training'}
             </Button>
           )}
         </div>
@@ -268,9 +265,9 @@ export default function AdvancedLearning() {
             <Brain className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{status?.learning_mode || 'Standard'}</div>
+            <div className="text-2xl font-bold">Advanced</div>
             <p className="text-xs text-muted-foreground">
-              {status?.is_training ? `Phase: ${status.current_phase}` : 'Ready to train'}
+              Stage: {status?.status?.curriculum?.stage || 'Ready to train'}
             </p>
           </CardContent>
         </Card>
@@ -282,7 +279,7 @@ export default function AdvancedLearning() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              {status?.enabled_features?.curriculum_learning ? (
+              {status?.status?.curriculum?.enabled ? (
                 <>
                   <CheckCircle className="h-4 w-4 text-green-500" />
                   <span className="text-sm font-medium">Enabled</span>
@@ -296,7 +293,7 @@ export default function AdvancedLearning() {
             </div>
             {curriculumProgress?.current_stage && (
               <p className="text-xs text-muted-foreground mt-1">
-                Stage: {curriculumProgress.current_stage.name}
+                Stage: {curriculumProgress.current_stage}
               </p>
             )}
           </CardContent>
@@ -309,7 +306,7 @@ export default function AdvancedLearning() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              {status?.enabled_features?.transfer_learning ? (
+              {status?.status?.transfer?.enabled ? (
                 <>
                   <CheckCircle className="h-4 w-4 text-green-500" />
                   <span className="text-sm font-medium">Enabled</span>
@@ -323,7 +320,7 @@ export default function AdvancedLearning() {
             </div>
             {transferRecommendations && (
               <p className="text-xs text-muted-foreground mt-1">
-                {transferRecommendations.available_models} models available
+                {transferRecommendations.available_models.length} models available
               </p>
             )}
           </CardContent>
@@ -336,7 +333,7 @@ export default function AdvancedLearning() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
-              {status?.enabled_features?.meta_learning ? (
+              {status?.status?.meta?.enabled ? (
                 <>
                   <CheckCircle className="h-4 w-4 text-green-500" />
                   <span className="text-sm font-medium">Enabled</span>
@@ -348,9 +345,9 @@ export default function AdvancedLearning() {
                 </>
               )}
             </div>
-            {metaInsights?.insights && (
+            {metaInsights?.adaptation_metrics && (
               <p className="text-xs text-muted-foreground mt-1">
-                {metaInsights.insights.total_adaptations} adaptations
+                {metaInsights.adaptation_metrics.meta_optimization_steps} steps
               </p>
             )}
           </CardContent>
@@ -384,62 +381,58 @@ export default function AdvancedLearning() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {curriculumProgress?.enabled ? (
+              {curriculumProgress?.success ? (
                 <div className="space-y-4">
-                  {curriculumProgress.current_stage && (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <h4 className="text-sm font-medium">
-                          Current Stage: {curriculumProgress.current_stage.name}
-                        </h4>
-                        <Badge variant="outline">
-                          Stage {curriculumProgress.current_stage.index + 1} of {curriculumProgress.current_stage.total_stages}
-                        </Badge>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-sm font-medium">
+                        Current Stage: {curriculumProgress.current_stage}
+                      </h4>
+                      <Badge variant="outline">
+                        Stage {curriculumProgress.stage_index + 1} of {curriculumProgress.total_stages}
+                      </Badge>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span>Stage Progress</span>
+                        <span>
+                          {(curriculumProgress.progress * 100).toFixed(1)}%
+                        </span>
                       </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-sm">
-                          <span>Episodes Progress</span>
-                          <span>
-                            {curriculumProgress.current_stage.episodes_completed} / {curriculumProgress.current_stage.episodes_target}
-                          </span>
-                        </div>
-                        <Progress 
-                          value={(curriculumProgress.current_stage.episodes_completed / curriculumProgress.current_stage.episodes_target) * 100}
-                          className="w-full"
-                        />
+                      <Progress 
+                        value={curriculumProgress.progress * 100}
+                        className="w-full"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span>Completion Rate</span>
+                        <span>{(curriculumProgress.metrics.completion_rate * 100).toFixed(1)}%</span>
                       </div>
-
-                      {curriculumProgress.performance && (
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between text-sm">
-                            <span>Mastery Score</span>
-                            <span>{curriculumProgress.performance.mastery_score.toFixed(3)}</span>
-                          </div>
-                          <Progress 
-                            value={curriculumProgress.performance.mastery_score * 100}
-                            className="w-full"
-                          />
-                          <div className="text-xs text-muted-foreground">
-                            Threshold: {curriculumProgress.performance.success_threshold.toFixed(2)}
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="grid grid-cols-2 gap-4 mt-4">
-                        <div className="text-center p-3 bg-muted rounded-lg">
-                          <div className="text-2xl font-bold">{curriculumProgress.current_stage.difficulty.toFixed(1)}</div>
-                          <div className="text-xs text-muted-foreground">Difficulty Level</div>
-                        </div>
-                        <div className="text-center p-3 bg-muted rounded-lg">
-                          <div className="text-2xl font-bold">
-                            {curriculumProgress.performance?.ready_to_advance ? '✓' : '⏳'}
-                          </div>
-                          <div className="text-xs text-muted-foreground">Ready to Advance</div>
-                        </div>
+                      <Progress 
+                        value={curriculumProgress.metrics.completion_rate * 100}
+                        className="w-full"
+                      />
+                      <div className="text-xs text-muted-foreground">
+                        Threshold: {curriculumProgress.metrics.success_threshold.toFixed(2)}
                       </div>
                     </div>
-                  )}
+
+                    <div className="grid grid-cols-2 gap-4 mt-4">
+                      <div className="text-center p-3 bg-muted rounded-lg">
+                        <div className="text-2xl font-bold">{curriculumProgress.stage_index + 1}</div>
+                        <div className="text-xs text-muted-foreground">Current Stage</div>
+                      </div>
+                      <div className="text-center p-3 bg-muted rounded-lg">
+                        <div className="text-2xl font-bold">
+                          {curriculumProgress.metrics.adaptive_difficulty ? '✓' : '✗'}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Adaptive Difficulty</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <Alert>
@@ -464,38 +457,34 @@ export default function AdvancedLearning() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {transferRecommendations?.enabled ? (
+              {transferRecommendations?.success ? (
                 <div className="space-y-4">
-                  {transferRecommendations.recommendations.length > 0 ? (
+                  {transferRecommendations.available_models.length > 0 ? (
                     <div className="space-y-3">
-                      {transferRecommendations.recommendations.map((rec, index) => (
+                      {transferRecommendations.available_models.map((model, index) => (
                         <Card key={index} className="p-4">
                           <div className="flex items-center justify-between mb-2">
-                            <h4 className="font-medium">{rec.source_experiment}</h4>
+                            <h4 className="font-medium">{model.name}</h4>
                             <Badge variant="secondary">
-                              {(rec.compatibility_score * 100).toFixed(0)}% compatible
+                              {(model.compatibility * 100).toFixed(0)}% compatible
                             </Badge>
                           </div>
                           
-                          <div className="grid grid-cols-3 gap-4 text-sm">
+                          <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                              <div className="text-muted-foreground">Training Speedup</div>
-                              <div className="font-medium">{rec.expected_benefit.training_speedup.toFixed(1)}x</div>
+                              <div className="text-muted-foreground">Performance Gain</div>
+                              <div className="font-medium">+{(model.performance_gain * 100).toFixed(1)}%</div>
                             </div>
                             <div>
-                              <div className="text-muted-foreground">Performance Boost</div>
-                              <div className="font-medium">+{(rec.expected_benefit.final_performance_boost * 100).toFixed(1)}%</div>
-                            </div>
-                            <div>
-                              <div className="text-muted-foreground">Convergence</div>
-                              <div className="font-medium">{rec.expected_benefit.convergence_episodes} episodes</div>
+                              <div className="text-muted-foreground">Compatibility</div>
+                              <div className="font-medium">{(model.compatibility * 100).toFixed(1)}%</div>
                             </div>
                           </div>
                           
                           <div className="mt-2">
                             <div className="text-sm text-muted-foreground">Components:</div>
                             <div className="flex gap-1 mt-1">
-                              {rec.recommended_components.map((comp, i) => (
+                              {model.transfer_components.map((comp, i) => (
                                 <Badge key={i} variant="outline" className="text-xs">
                                   {comp}
                                 </Badge>
@@ -508,11 +497,25 @@ export default function AdvancedLearning() {
                   ) : (
                     <Alert>
                       <Info className="h-4 w-4" />
-                      <AlertTitle>No Transfer Recommendations</AlertTitle>
+                      <AlertTitle>No Transfer Models</AlertTitle>
                       <AlertDescription>
                         No compatible models found for transfer learning. Train some models first.
                       </AlertDescription>
                     </Alert>
+                  )}
+                  
+                  {transferRecommendations.recommendations.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Recommendations</h4>
+                      <div className="space-y-2">
+                        {transferRecommendations.recommendations.map((rec, index) => (
+                          <Alert key={index}>
+                            <Info className="h-4 w-4" />
+                            <AlertDescription>{rec}</AlertDescription>
+                          </Alert>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
               ) : (
@@ -538,35 +541,35 @@ export default function AdvancedLearning() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {metaInsights?.enabled ? (
+              {metaInsights?.success ? (
                 <div className="space-y-4">
-                  {metaInsights.insights ? (
+                  {metaInsights.adaptation_metrics ? (
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-3">
                         <div className="text-center p-3 bg-muted rounded-lg">
-                          <div className="text-2xl font-bold">{metaInsights.insights.total_adaptations}</div>
-                          <div className="text-xs text-muted-foreground">Total Adaptations</div>
+                          <div className="text-2xl font-bold">{metaInsights.adaptation_metrics.meta_optimization_steps}</div>
+                          <div className="text-xs text-muted-foreground">Optimization Steps</div>
                         </div>
                         <div className="text-center p-3 bg-muted rounded-lg">
                           <div className="text-2xl font-bold">
-                            {metaInsights.insights.average_adaptation_time.toFixed(1)}s
+                            {metaInsights.adaptation_metrics.learning_rate.toFixed(2)}
                           </div>
-                          <div className="text-xs text-muted-foreground">Avg Adaptation Time</div>
+                          <div className="text-xs text-muted-foreground">Learning Rate</div>
                         </div>
                       </div>
                       
                       <div className="space-y-3">
                         <div className="text-center p-3 bg-muted rounded-lg">
                           <div className="text-2xl font-bold">
-                            {(metaInsights.insights.average_performance_improvement * 100).toFixed(1)}%
+                            {(metaInsights.adaptation_metrics.few_shot_performance * 100).toFixed(1)}%
                           </div>
-                          <div className="text-xs text-muted-foreground">Avg Performance Gain</div>
+                          <div className="text-xs text-muted-foreground">Few-Shot Performance</div>
                         </div>
                         <div className="text-center p-3 bg-muted rounded-lg">
                           <div className="text-2xl font-bold">
-                            {(metaInsights.insights.adaptation_success_rate * 100).toFixed(0)}%
+                            {(metaInsights.adaptation_metrics.generalization_score * 100).toFixed(0)}%
                           </div>
-                          <div className="text-xs text-muted-foreground">Success Rate</div>
+                          <div className="text-xs text-muted-foreground">Generalization Score</div>
                         </div>
                       </div>
                     </div>
@@ -580,10 +583,26 @@ export default function AdvancedLearning() {
                     </Alert>
                   )}
 
+                  {metaInsights.insights && metaInsights.insights.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Insights</h4>
+                      <ScrollArea className="h-24">
+                        <div className="space-y-2">
+                          {metaInsights.insights.map((insight, index) => (
+                            <Alert key={index}>
+                              <Info className="h-4 w-4" />
+                              <AlertDescription>{insight}</AlertDescription>
+                            </Alert>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </div>
+                  )}
+                  
                   {metaInsights.recommendations && metaInsights.recommendations.length > 0 && (
                     <div className="space-y-2">
                       <h4 className="font-medium">Recommendations</h4>
-                      <ScrollArea className="h-32">
+                      <ScrollArea className="h-24">
                         <div className="space-y-2">
                           {metaInsights.recommendations.map((rec, index) => (
                             <Alert key={index}>
