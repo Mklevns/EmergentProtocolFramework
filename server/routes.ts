@@ -927,16 +927,8 @@ print(json.dumps(result))
 
   app.get('/api/advanced/status', async (req, res) => {
     try {
-      const pythonPath = path.join(process.cwd(), 'server/services/advanced_learning_api.py');
-      const pythonProcess = spawn('python3', ['-c', `
-import sys
-sys.path.append('${path.join(process.cwd(), 'server/services')}')
-from advanced_learning_api import handle_advanced_learning_request
-import json
-
-result = handle_advanced_learning_request('status', {})
-print(json.dumps(result))
-`], {
+      const pythonPath = path.join(process.cwd(), 'server/services/advanced_learning_simple.py');
+      const pythonProcess = spawn('python3', [pythonPath, 'status'], {
         stdio: ['pipe', 'pipe', 'pipe'],
         cwd: process.cwd()
       });
@@ -1040,16 +1032,8 @@ print(json.dumps(result))
 
   app.get('/api/advanced/curriculum_progress', async (req, res) => {
     try {
-      const pythonPath = path.join(process.cwd(), 'server/services/advanced_learning_api.py');
-      const pythonProcess = spawn('python3', ['-c', `
-import sys
-sys.path.append('${path.join(process.cwd(), 'server/services')}')
-from advanced_learning_api import handle_advanced_learning_request
-import json
-
-result = handle_advanced_learning_request('curriculum_progress', {})
-print(json.dumps(result))
-`], {
+      const pythonPath = path.join(process.cwd(), 'server/services/advanced_learning_simple.py');
+      const pythonProcess = spawn('python3', [pythonPath, 'curriculum_progress'], {
         stdio: ['pipe', 'pipe', 'pipe'],
         cwd: process.cwd()
       });
@@ -1077,25 +1061,13 @@ print(json.dumps(result))
     }
   });
 
-  app.post('/api/advanced/transfer_recommendations', async (req, res) => {
+  app.get('/api/advanced/transfer_recommendations', async (req, res) => {
     try {
-      const pythonPath = path.join(process.cwd(), 'server/services/advanced_learning_api.py');
-      const pythonProcess = spawn('python3', ['-c', `
-import sys
-sys.path.append('${path.join(process.cwd(), 'server/services')}')
-from advanced_learning_api import handle_advanced_learning_request
-import json
-
-request_data = json.loads(input())
-result = handle_advanced_learning_request('transfer_recommendations', request_data)
-print(json.dumps(result))
-`], {
+      const pythonPath = path.join(process.cwd(), 'server/services/advanced_learning_simple.py');
+      const pythonProcess = spawn('python3', [pythonPath, 'transfer_recommendations'], {
         stdio: ['pipe', 'pipe', 'pipe'],
         cwd: process.cwd()
       });
-
-      pythonProcess.stdin.write(JSON.stringify(req.body));
-      pythonProcess.stdin.end();
 
       let stdout = '';
 
@@ -1122,16 +1094,8 @@ print(json.dumps(result))
 
   app.get('/api/advanced/meta_insights', async (req, res) => {
     try {
-      const pythonPath = path.join(process.cwd(), 'server/services/advanced_learning_api.py');
-      const pythonProcess = spawn('python3', ['-c', `
-import sys
-sys.path.append('${path.join(process.cwd(), 'server/services')}')
-from advanced_learning_api import handle_advanced_learning_request
-import json
-
-result = handle_advanced_learning_request('meta_insights', {})
-print(json.dumps(result))
-`], {
+      const pythonPath = path.join(process.cwd(), 'server/services/advanced_learning_simple.py');
+      const pythonProcess = spawn('python3', [pythonPath, 'meta_insights'], {
         stdio: ['pipe', 'pipe', 'pipe'],
         cwd: process.cwd()
       });
