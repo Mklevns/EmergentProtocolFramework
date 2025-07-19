@@ -12,6 +12,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### Database Persistence System Implementation (July 19, 2025)
+- ✅ **Direct Python Database Access**: Created comprehensive `python_db.py` with PostgreSQL connection pooling and full CRUD operations
+- ✅ **Enhanced Database Storage**: Implemented `DatabaseStorage` class to work alongside existing MemStorage system
+- ✅ **Persistent Training Service**: Built `persistent_training_service.py` for robust long-running MARL experiments with database checkpoints
+- ✅ **Enhanced Shared Memory**: Created `enhanced_shared_memory.py` with vector compression, persistence levels, and quality management
+- ✅ **Database Schema Applied**: Successfully pushed database schema changes using Drizzle ORM
+- ✅ **API Routes for Persistence**: Added `/api/training/persistent/*` routes for database-backed training management
+- ✅ **Automatic Storage Selection**: System intelligently chooses database storage when DATABASE_URL is available
+- ✅ **Data Integrity**: Comprehensive error handling and connection pooling for robust long-running experiments
+- ✅ **Background Persistence**: Asynchronous database operations to maintain performance while ensuring data safety
+
 ### Advanced Learning System Complete & Navigation Fixed (July 19, 2025)
 - ✅ **Advanced Learning Tab Visible**: Fixed Navigation component integration in App.tsx for proper visibility
 - ✅ **Dependency Issues Resolved**: Created simplified advanced learning system without NumPy dependencies
@@ -77,10 +88,12 @@ Preferred communication style: Simple, everyday language.
 - **Real-time Communication**: WebSocket integration for live updates
 
 ### Backend Architecture
-- **Runtime**: Node.js with Express.js
-- **Database**: PostgreSQL with Drizzle ORM
+- **Runtime**: Node.js with Express.js with TypeScript
+- **Database**: PostgreSQL with Drizzle ORM for schema management and direct Python access via psycopg2
+- **Storage Layer**: Hybrid system with database persistence and in-memory caching for optimal performance
 - **Real-time Updates**: WebSocket server for live data streaming
-- **Python Services**: Bio-inspired MARL framework with specialized services
+- **Python Services**: Bio-inspired MARL framework with direct database persistence for long-running experiments
+- **Connection Pooling**: Robust database connection management with automatic failover to in-memory storage
 
 ## Key Components
 

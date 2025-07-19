@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { insertAgentSchema, insertExperimentSchema, insertMessageSchema } from "@shared/schema";
 import { spawn } from "child_process";
 import path from "path";
+import { setupPersistentTrainingRoutes } from "./routes/persistent_training_routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
@@ -1502,6 +1503,9 @@ print(json.dumps(result))
       res.status(500).json({ error: 'Failed to initialize demo data' });
     }
   });
+
+  // Setup persistent training routes with database access
+  setupPersistentTrainingRoutes(app, broadcast);
 
   return httpServer;
 }

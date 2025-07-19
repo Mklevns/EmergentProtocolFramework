@@ -4,11 +4,14 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.11"
 dependencies = [
+    "alembic>=1.16.4",
     "flask>=3.1.1",
     "numpy>=2.3.1",
     "pettingzoo==1.24.3",
+    "psycopg2-binary>=2.9.10",
     "ray==2.40.0",
     "raylib-py>=5.5.0",
+    "sqlalchemy>=2.0.41",
     "supersuit==3.9.3",
     "torch==2.5.1",
 ]
