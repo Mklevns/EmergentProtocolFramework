@@ -4,13 +4,18 @@ A cutting-edge multi-agent reinforcement learning (MARL) platform that enables s
 
 ## 🌟 Features
 
+- **Enhanced Research Framework**: Systematic experiment execution with hypothesis validation and statistical analysis
+- **Bio-Inspired RLlib Integration**: Ray RLlib 2.9+ with pheromone attention networks, neural plasticity, and homeostatic regulation
+- **YAML-Driven Research Campaigns**: Structured experiment definitions with parameter variations and hypothesis specification
+- **Research Dashboard**: Complete web interface for experiment creation, monitoring, and analysis at `/research`
 - **3D Agent Grid System**: 30 intelligent agents organized in a 4×3×3 grid structure
 - **Hierarchical Communication**: Multi-level message routing with emergent protocols
 - **Database Persistence**: Robust PostgreSQL integration for long-running experiments
 - **Real-time Visualization**: Live data streaming via WebSocket connections
 - **Bio-inspired Algorithms**: Pheromone trails, neural plasticity, and swarm coordination
 - **Advanced Learning Systems**: Curriculum learning, meta-learning, and transfer learning
-- **Breakthrough Detection**: Automatic identification of significant agent achievements
+- **Statistical Analysis**: Automated hypothesis validation with confidence thresholds and effect size calculations
+- **Emergence Metrics**: Comprehensive tracking of coordination efficiency, mutual information, and protocol complexity
 
 ## 🏗️ Architecture
 
@@ -74,24 +79,44 @@ npm install
 ```
 
 #### Python Dependencies
-The system uses Python for advanced MARL algorithms. Install the core dependencies:
+The system uses Python for advanced MARL algorithms and research framework. Install dependencies based on your needs:
 
+##### Core Dependencies (Required)
 ```bash
-# Core database dependencies (required)
+# Database and web framework (always required)
 pip install psycopg2-binary==2.9.9
 pip install SQLAlchemy==2.0.23
 pip install alembic==1.13.1
 pip install flask==3.0.0
-
-# Optional: Machine Learning libraries (may have compatibility issues in some environments)
-# Uncomment only if your environment supports them:
-# pip install torch==2.1.1
-# pip install numpy==1.26.2
-# pip install ray[rllib]==2.8.1
-# pip install pettingzoo==1.24.3
 ```
 
-**Note**: The system is designed to work without heavy ML dependencies and will gracefully fallback to simplified algorithms if packages like NumPy or Ray are unavailable.
+##### Research Framework Dependencies (Recommended)
+```bash
+# Enhanced research framework with RLlib integration
+pip install ray[rllib]==2.9.3
+pip install torch>=2.0.0
+pip install numpy==1.24.3
+pip install pettingzoo>=1.24.0
+pip install gymnasium==0.28.1
+
+# Configuration and analysis
+pip install pyyaml>=6.0
+pip install pandas>=1.5.0
+pip install scipy>=1.9.0
+pip install scikit-learn>=1.2.0
+
+# Statistical analysis
+pip install statsmodels>=0.14.0
+pip install pingouin>=0.5.0
+```
+
+##### Full Research Setup (Optional)
+For complete research capabilities, install from requirements file:
+```bash
+pip install -r requirements_research.txt
+```
+
+**Note**: The system includes automatic fallbacks. If advanced ML libraries are unavailable, it will use simplified algorithms while maintaining core functionality.
 
 ### 4. Database Schema Migration
 
@@ -114,11 +139,39 @@ The application will be available at `http://localhost:5000`
 ### Basic Operations
 
 1. **Initialize Demo Data**: Click "Initialize Demo" to create sample agents
-2. **Start Training**: Use the training controls to begin MARL experiments
-3. **Monitor Progress**: Watch real-time metrics and visualizations
-4. **View Memory**: Explore shared agent memory and communication patterns
+2. **Access Research Dashboard**: Navigate to `/research` for comprehensive experiment management
+3. **Create Research Experiments**: Use the Research Dashboard to design structured experiments with hypothesis validation
+4. **Start Training**: Use training controls or research framework for MARL experiments
+5. **Monitor Progress**: Watch real-time metrics, visualizations, and research progress
+6. **Analyze Results**: Review statistical analysis, hypothesis validation, and emergence metrics
 
 ### Advanced Features
+
+#### Research Framework
+Access the systematic research framework for structured experimentation:
+
+```bash
+# Check research framework status
+curl -X GET "http://localhost:5000/api/research/status"
+
+# Create structured research experiment
+curl -X POST "http://localhost:5000/api/research/experiments" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "experiment_name": "Pheromone Communication Study",
+    "hypothesis_id": "H1_pheromone_emergence",
+    "description": "Testing pheromone-like communication in resource foraging",
+    "environment_type": "ForagingEnvironment",
+    "num_agents": 8,
+    "training_steps": 1000
+  }'
+
+# Run experiment with automatic analysis
+curl -X POST "http://localhost:5000/api/research/experiments/{id}/run"
+
+# Get hypothesis validation results
+curl -X GET "http://localhost:5000/api/research/hypotheses"
+```
 
 #### Persistent Training
 Access database-backed training experiments:
@@ -186,24 +239,32 @@ export const GRID_CONFIG = {
 
 ## 🧠 Core Components
 
-### 1. Agent Types
+### 1. Enhanced Research Framework
+- **Systematic Experimentation**: Structured baseline, intervention, and validation phases
+- **Hypothesis Validation**: Automated statistical analysis with confidence thresholds
+- **YAML Configuration**: Campaign-driven experiment definitions
+- **Bio-Inspired RLlib**: Advanced neural architectures with attention mechanisms and plasticity
+
+### 2. Agent Types
 - **Regular Agents**: Handle local tasks and peer communication
 - **Coordinator Agents**: Manage regional oversight and inter-coordinator communication
 
-### 2. Communication Protocol
+### 3. Communication Protocol
 - **Message Types**: pointer, broadcast, breakthrough, coordination, heartbeat
 - **Hierarchical Routing**: Multi-level message distribution
 - **Emergent Patterns**: System learns efficient communication strategies
+- **Pheromone Networks**: Multi-head attention simulating pheromone trails
 
-### 3. Memory System
+### 4. Memory System
 - **Vectorized Storage**: Efficient shared information lookup
 - **Persistence Levels**: Critical, high, medium, low priority data
 - **Compression**: Automatic vector compression for storage optimization
+- **Neural Plasticity**: GRU-based adaptive memory with homeostatic regulation
 
-### 4. Training Orchestration
-- **Episode Management**: Coordinated training sessions
-- **Metrics Collection**: Comprehensive performance tracking
-- **Checkpoint System**: Automatic saving at configured intervals
+### 5. Statistical Analysis
+- **Emergence Metrics**: Coordination efficiency, mutual information, protocol complexity
+- **Hypothesis Testing**: Automated validation with effect size calculations
+- **Research Tracking**: Comprehensive experiment management and progress monitoring
 
 ## 🐛 Troubleshooting
 
@@ -267,10 +328,12 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 📚 Additional Resources
 
+- **Research Framework Guide**: See `docs/RESEARCH_FRAMEWORK_GUIDE.md` for detailed usage instructions
 - [Ray RLlib Documentation](https://docs.ray.io/en/latest/rllib/)
 - [PettingZoo Multi-Agent Environments](https://pettingzoo.farama.org/)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [React + TypeScript Guide](https://react-typescript-cheatsheet.netlify.app/)
+- [Bio-Inspired MARL Research](https://arxiv.org/abs/1909.11740) - Emergent Communication in Multi-Agent Systems
 
 ---
 

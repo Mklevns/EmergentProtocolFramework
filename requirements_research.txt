@@ -1,18 +1,20 @@
 # Enhanced Research Framework Dependencies
-# Based on the suggestions from the research document
+# Comprehensive dependencies for bio-inspired MARL research framework
+# Based on research document recommendations for RLlib 2.9+ integration
 
-# Core Machine Learning
+# Core Machine Learning & Reinforcement Learning
 ray[rllib]==2.9.3
+ray[tune]>=2.9.3  # For hyperparameter optimization
 gymnasium==0.28.1
 pettingzoo>=1.24.0
 supersuit==3.8.0
-torch>=2.0.0
-numpy==1.24.3
+torch>=2.0.0,<2.6.0  # Ensure compatibility with Ray RLlib
+numpy>=1.24.0,<2.0.0  # Stable version for scientific computing
 
-# Data Processing & Analysis
-pandas>=1.5.0
-scipy>=1.9.0
-scikit-learn>=1.2.0
+# Data Processing & Analysis (Research Framework Core)
+pandas>=1.5.0  # Data manipulation and analysis
+scikit-learn>=1.2.0  # Machine learning utilities
+tables>=3.8.0  # HDF5 support for large datasets
 
 # Visualization
 matplotlib>=3.6.0
@@ -20,17 +22,20 @@ seaborn>=0.12.0
 plotly>=5.15.0
 networkx>=3.0
 
-# Configuration Management
-pyyaml>=6.0
-hydra-core>=1.3.0
+# Configuration Management (Essential for Research Framework)
+pyyaml>=6.0  # YAML-driven experiment campaigns
+hydra-core>=1.3.0  # Advanced configuration management
+omegaconf>=2.3.0  # Configuration composition
 
-# Statistical Analysis
+# Statistical Analysis (Core for Hypothesis Validation)
 statsmodels>=0.14.0
-pingouin>=0.5.0  # Advanced statistical tests
+pingouin>=0.5.0  # Advanced statistical tests for emergence metrics
+scipy>=1.9.0  # Scientific computing foundation
 
 # Research & Experiment Tracking
-tensorboard>=2.13.0
+tensorboard>=2.13.0  # Ray RLlib native integration
 wandb>=0.15.0  # Optional: for advanced experiment tracking
+mlflow>=2.5.0  # Alternative experiment tracking
 
 # Parallel Processing
 joblib>=1.3.0
@@ -58,6 +63,19 @@ myst-parser>=2.0.0  # Markdown support for Sphinx
 # Optional Ray Tune for hyperparameter optimization
 ray[tune]>=2.9.3
 
-# Optional specialized libraries
+# Bio-Inspired Architecture Components
+transformers>=4.21.0  # Attention mechanisms for pheromone networks
+einops>=0.6.0  # Tensor operations for neural plasticity
+
+# Optional Specialized Libraries
 optuna>=3.2.0  # Hyperparameter optimization
 hyperopt>=0.2.7  # Alternative hyperparameter optimization
+nevergrad>=0.5.0  # Gradient-free optimization
+
+# Communication & Network Analysis
+networkx>=3.0  # Agent communication graph analysis
+igraph>=0.10.0  # Alternative graph analysis library
+
+# Bio-Inspired Computing Extensions
+deap>=1.3.0  # Evolutionary algorithms for protocol evolution
+mesa>=2.0.0  # Agent-based modeling framework integration

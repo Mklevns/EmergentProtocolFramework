@@ -4,16 +4,30 @@ version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.11"
 dependencies = [
+    # Core database and web framework (required)
     "alembic>=1.16.4",
-    "flask>=3.1.1",
-    "numpy>=2.3.1",
-    "pettingzoo==1.24.3",
+    "flask>=3.1.1", 
     "psycopg2-binary>=2.9.10",
-    "ray==2.40.0",
-    "raylib-py>=5.5.0",
     "sqlalchemy>=2.0.41",
-    "supersuit==3.9.3",
-    "torch==2.5.1",
+    "pyyaml>=6.0",
+    
+    # Enhanced research framework (recommended)
+    "ray[rllib]>=2.9.3,<3.0.0",
+    "torch>=2.0.0,<2.6.0",
+    "numpy>=1.24.0,<2.0.0",
+    "pettingzoo>=1.24.0",
+    "gymnasium>=0.28.1",
+    "supersuit>=3.8.0",
+    
+    # Analysis and statistics
+    "pandas>=1.5.0",
+    "scipy>=1.9.0", 
+    "scikit-learn>=1.2.0",
+    "statsmodels>=0.14.0",
+    "networkx>=3.0",
+    
+    # Optional components (graceful fallback if unavailable)
+    "raylib-py>=5.5.0",
 ]
 
 [[tool.uv.index]]
