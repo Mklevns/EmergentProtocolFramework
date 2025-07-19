@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Brain, Network, Settings, Play } from "lucide-react";
+import { Moon, Sun, Brain, Network, Settings, Play, TrendingUp } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 
 export function Navigation() {
@@ -11,6 +11,7 @@ export function Navigation() {
     { path: "/", label: "Dashboard", icon: Brain },
     { path: "/visualization", label: "Visualization", icon: Network },
     { path: "/training", label: "Training", icon: Play },
+    { path: "/advanced-learning", label: "Advanced Learning", icon: TrendingUp },
     { path: "/config", label: "Configuration", icon: Settings },
   ];
 

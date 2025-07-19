@@ -193,27 +193,42 @@ advanced:
     mutation_rate: 0.1
     
   transfer_learning:
-    enabled: false
+    enabled: true
     source_experiment: ""
-    transfer_components: ["attention", "memory"]
+    transfer_components: ["attention", "memory", "communication"]
+    model_registry_path: "./models"
+    compatibility_threshold: 0.7
     
   meta_learning:
-    enabled: false
+    enabled: true
     adaptation_steps: 5
     meta_lr: 0.01
+    inner_lr: 0.1
+    task_batch_size: 4
+    support_episodes: 20
+    query_episodes: 10
     
   curriculum_learning:
-    enabled: false
+    enabled: true
+    adaptive_progression: true
+    success_threshold: 0.75
     stages:
       - name: "basic_coordination"
         episodes: 200
         difficulty: 0.3
+        success_threshold: 0.75
+      - name: "intermediate_coordination"
+        episodes: 400
+        difficulty: 0.5
+        success_threshold: 0.8
       - name: "advanced_coordination"
         episodes: 500
         difficulty: 0.7
+        success_threshold: 0.85
       - name: "expert_coordination"
         episodes: 300
         difficulty: 1.0
+        success_threshold: 0.9
 
 # Deployment Configuration
 deployment:

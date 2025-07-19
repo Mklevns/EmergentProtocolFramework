@@ -872,6 +872,293 @@ print(json.dumps(template))
     }
   });
 
+  // Advanced Learning API endpoints
+  app.post('/api/advanced/initialize', async (req, res) => {
+    try {
+      const pythonPath = path.join(process.cwd(), 'server/services/advanced_learning_api.py');
+      const pythonProcess = spawn('python3', ['-c', `
+import sys
+sys.path.append('${path.join(process.cwd(), 'server/services')}')
+from advanced_learning_api import handle_advanced_learning_request
+import json
+
+request_data = json.loads(input())
+result = handle_advanced_learning_request('initialize', request_data)
+print(json.dumps(result))
+`], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd()
+      });
+
+      pythonProcess.stdin.write(JSON.stringify(req.body));
+      pythonProcess.stdin.end();
+
+      let stdout = '';
+      let stderr = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdout.trim());
+            broadcast({ type: 'advanced_learning_initialized', data: result });
+            res.json(result);
+          } catch (error) {
+            console.error('Failed to parse advanced learning result:', error);
+            res.status(500).json({ error: 'Failed to parse result' });
+          }
+        } else {
+          console.error('Advanced learning initialization failed:', stderr);
+          res.status(500).json({ error: 'Failed to initialize advanced learning' });
+        }
+      });
+    } catch (error) {
+      console.error('Error initializing advanced learning:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.get('/api/advanced/status', async (req, res) => {
+    try {
+      const pythonPath = path.join(process.cwd(), 'server/services/advanced_learning_api.py');
+      const pythonProcess = spawn('python3', ['-c', `
+import sys
+sys.path.append('${path.join(process.cwd(), 'server/services')}')
+from advanced_learning_api import handle_advanced_learning_request
+import json
+
+result = handle_advanced_learning_request('status', {})
+print(json.dumps(result))
+`], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd()
+      });
+
+      let stdout = '';
+      let stderr = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdout.trim());
+            res.json(result);
+          } catch (error) {
+            console.error('Failed to parse status result:', error);
+            res.status(500).json({ error: 'Failed to parse status' });
+          }
+        } else {
+          console.error('Advanced learning status failed:', stderr);
+          res.status(500).json({ error: 'Failed to get status' });
+        }
+      });
+    } catch (error) {
+      console.error('Error getting advanced learning status:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.post('/api/advanced/start_training', async (req, res) => {
+    try {
+      const pythonPath = path.join(process.cwd(), 'server/services/advanced_learning_api.py');
+      const pythonProcess = spawn('python3', ['-c', `
+import sys
+sys.path.append('${path.join(process.cwd(), 'server/services')}')
+from advanced_learning_api import handle_advanced_learning_request
+import json
+
+request_data = json.loads(input())
+result = handle_advanced_learning_request('start_training', request_data)
+print(json.dumps(result))
+`], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd()
+      });
+
+      pythonProcess.stdin.write(JSON.stringify(req.body));
+      pythonProcess.stdin.end();
+
+      let stdout = '';
+      let stderr = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+        // Try to parse and broadcast real-time metrics
+        try {
+          const lines = data.toString().split('\n');
+          for (const line of lines) {
+            if (line.trim().startsWith('{') && line.trim().endsWith('}')) {
+              const metrics = JSON.parse(line.trim());
+              if (metrics.type === 'advanced_learning_metrics') {
+                broadcast({ type: 'advanced_metrics', data: metrics });
+              }
+            }
+          }
+        } catch (e) {
+          // Not JSON, regular log
+        }
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdout.trim());
+            broadcast({ type: 'advanced_training_started', data: result });
+            res.json(result);
+          } catch (error) {
+            console.error('Failed to parse training result:', error);
+            res.status(500).json({ error: 'Failed to parse result' });
+          }
+        } else {
+          console.error('Advanced training failed:', stderr);
+          res.status(500).json({ error: 'Failed to start advanced training' });
+        }
+      });
+    } catch (error) {
+      console.error('Error starting advanced training:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.get('/api/advanced/curriculum_progress', async (req, res) => {
+    try {
+      const pythonPath = path.join(process.cwd(), 'server/services/advanced_learning_api.py');
+      const pythonProcess = spawn('python3', ['-c', `
+import sys
+sys.path.append('${path.join(process.cwd(), 'server/services')}')
+from advanced_learning_api import handle_advanced_learning_request
+import json
+
+result = handle_advanced_learning_request('curriculum_progress', {})
+print(json.dumps(result))
+`], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd()
+      });
+
+      let stdout = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdout.trim());
+            res.json(result);
+          } catch (error) {
+            res.status(500).json({ error: 'Failed to parse curriculum progress' });
+          }
+        } else {
+          res.status(500).json({ error: 'Failed to get curriculum progress' });
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.post('/api/advanced/transfer_recommendations', async (req, res) => {
+    try {
+      const pythonPath = path.join(process.cwd(), 'server/services/advanced_learning_api.py');
+      const pythonProcess = spawn('python3', ['-c', `
+import sys
+sys.path.append('${path.join(process.cwd(), 'server/services')}')
+from advanced_learning_api import handle_advanced_learning_request
+import json
+
+request_data = json.loads(input())
+result = handle_advanced_learning_request('transfer_recommendations', request_data)
+print(json.dumps(result))
+`], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd()
+      });
+
+      pythonProcess.stdin.write(JSON.stringify(req.body));
+      pythonProcess.stdin.end();
+
+      let stdout = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdout.trim());
+            res.json(result);
+          } catch (error) {
+            res.status(500).json({ error: 'Failed to parse transfer recommendations' });
+          }
+        } else {
+          res.status(500).json({ error: 'Failed to get transfer recommendations' });
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.get('/api/advanced/meta_insights', async (req, res) => {
+    try {
+      const pythonPath = path.join(process.cwd(), 'server/services/advanced_learning_api.py');
+      const pythonProcess = spawn('python3', ['-c', `
+import sys
+sys.path.append('${path.join(process.cwd(), 'server/services')}')
+from advanced_learning_api import handle_advanced_learning_request
+import json
+
+result = handle_advanced_learning_request('meta_insights', {})
+print(json.dumps(result))
+`], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        cwd: process.cwd()
+      });
+
+      let stdout = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(stdout.trim());
+            res.json(result);
+          } catch (error) {
+            res.status(500).json({ error: 'Failed to parse meta-learning insights' });
+          }
+        } else {
+          res.status(500).json({ error: 'Failed to get meta-learning insights' });
+        }
+      });
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   app.get('/api/training/status', async (req, res) => {
     try {
       const experiments = await storage.getAllExperiments();
