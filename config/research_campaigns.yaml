@@ -1,0 +1,238 @@
+# Research Campaign Configurations
+# YAML-driven experiment definitions as suggested in the research framework document
+
+campaign_name: "emergent_communication_study"
+
+# Base configuration template
+base_config:
+  experiment_name: "Bio-Inspired Emergent Communication"
+  description: "Systematic study of emergent communication protocols in multi-agent environments"
+  
+  # Environment settings
+  environment_type: "ForagingEnvironment"
+  communication_range: 2.0
+  
+  # Agent architecture
+  agent_architecture: "bio_inspired_ppo"
+  attention_heads: 8
+  
+  # Training parameters
+  episodes_per_step: 1
+  learning_rate: 3e-4
+  batch_size: 128
+  
+  # Research methodology
+  baseline_episodes: 200
+  intervention_episodes: 500
+  validation_episodes: 300
+  significance_level: 0.05
+  effect_size_threshold: 0.2
+  minimum_sample_size: 100
+  
+  # Reward structure
+  reward_structure:
+    individual_collection: 1.0
+    collective_efficiency: 2.0
+    communication_cost: -0.1
+    coordination_bonus: 1.5
+
+# Research hypotheses to test
+hypotheses:
+  - hypothesis_id: "H1_pheromone_emergence"
+    title: "Pheromone-like Communication Emergence"
+    description: "Agents will develop pheromone-like trail communication under resource scarcity"
+    independent_variables: ["resource_scarcity", "agent_density"]
+    dependent_variables: ["communication_frequency", "coordination_efficiency"]
+    predicted_outcome: "Higher resource scarcity will lead to increased pheromone communication"
+    confidence_threshold: 0.8
+    
+  - hypothesis_id: "H2_swarm_coordination"
+    title: "Swarm Coordination Protocol Development"
+    description: "Larger agent groups will develop hierarchical communication patterns"
+    independent_variables: ["num_agents", "grid_complexity"]
+    dependent_variables: ["protocol_complexity", "semantic_stability"]
+    predicted_outcome: "Larger swarms will exhibit more complex but stable communication protocols"
+    confidence_threshold: 0.75
+    
+  - hypothesis_id: "H3_environmental_pressure"
+    title: "Environmental Pressure Communication Adaptation"
+    description: "Communication protocols adapt to environmental pressures and noise"
+    independent_variables: ["environmental_noise", "task_complexity"]
+    dependent_variables: ["protocol_complexity", "mutual_information"]
+    predicted_outcome: "Higher environmental pressure will lead to more robust communication"
+    confidence_threshold: 0.7
+
+# Experimental variations to test
+variations:
+  # Agent configuration variations
+  num_agents: [4, 8, 12, 20]
+  hidden_dim: [256, 512]
+  
+  # Environmental variations
+  grid_size: 
+    - [4, 4, 1]   # 2D simple
+    - [6, 6, 2]   # 2.5D medium
+    - [8, 8, 3]   # 3D complex
+  
+  # Training variations
+  training_steps: [500, 1000, 1500]
+  
+  # Pressure condition variations
+  pressure_conditions:
+    - name: "low_pressure"
+      resource_scarcity: 0.2
+      environmental_noise: 0.1
+      task_complexity: 0.3
+      
+    - name: "medium_pressure" 
+      resource_scarcity: 0.5
+      environmental_noise: 0.2
+      task_complexity: 0.6
+      
+    - name: "high_pressure"
+      resource_scarcity: 0.8
+      environmental_noise: 0.4
+      task_complexity: 0.9
+
+# Specific experiment configurations
+experiments:
+  ant_foraging_study:
+    base: "base_config"
+    hypothesis_id: "H1_pheromone_emergence"
+    experiment_name: "Ant Colony Foraging Communication"
+    description: "Study of pheromone-like communication emergence in foraging tasks"
+    
+    # Specific overrides
+    environment_type: "ForagingEnvironment"
+    num_agents: 8
+    grid_size: [6, 6, 1]
+    training_steps: 1000
+    
+    # Ant-specific reward structure
+    reward_structure:
+      individual_collection: 1.0
+      collective_efficiency: 3.0  # Higher emphasis on collective behavior
+      pheromone_trail_bonus: 0.5
+      communication_cost: -0.05
+    
+    # Environmental pressures specific to foraging
+    pressure_conditions:
+      - name: "abundant_resources"
+        resource_scarcity: 0.1
+        food_distribution: "clustered"
+        predator_pressure: 0.0
+        
+      - name: "scarce_resources"
+        resource_scarcity: 0.7
+        food_distribution: "scattered" 
+        predator_pressure: 0.3
+
+  bee_waggle_dance_study:
+    base: "base_config"
+    hypothesis_id: "H2_swarm_coordination"
+    experiment_name: "Bee Waggle Dance Spatial Communication"
+    description: "Study of spatial communication protocol emergence inspired by bee waggle dance"
+    
+    # Bee-specific configuration
+    environment_type: "SpatialNavigationEnvironment"
+    num_agents: 12
+    grid_size: [8, 8, 2]
+    hidden_dim: 512
+    attention_heads: 12
+    training_steps: 1500
+    
+    # Spatial communication reward structure
+    reward_structure:
+      navigation_accuracy: 3.0
+      information_sharing: 2.0
+      spatial_coordination: 2.5
+      distance_efficiency: 1.0
+    
+    # Spatial environment pressures
+    pressure_conditions:
+      - name: "simple_navigation"
+        landmark_density: 0.8
+        environmental_noise: 0.1
+        spatial_complexity: 0.3
+        
+      - name: "complex_navigation"
+        landmark_density: 0.3
+        environmental_noise: 0.4
+        spatial_complexity: 0.8
+
+  multi_scale_emergence_study:
+    base: "base_config"
+    hypothesis_id: "H3_environmental_pressure"
+    experiment_name: "Multi-Scale Communication Emergence"
+    description: "Study communication emergence across different scales and pressures"
+    
+    # Multi-scale configuration
+    environment_type: "MultiScaleEnvironment"
+    training_steps: 2000
+    
+    # Test across multiple scales
+    scale_variations:
+      - num_agents: 4
+        grid_size: [4, 4, 1]
+        complexity_level: "simple"
+        
+      - num_agents: 12  
+        grid_size: [6, 6, 2]
+        complexity_level: "medium"
+        
+      - num_agents: 24
+        grid_size: [8, 8, 3] 
+        complexity_level: "complex"
+    
+    # Progressive pressure testing
+    pressure_schedule:
+      - episodes: [0, 200]
+        pressure: "low_pressure"
+      - episodes: [200, 700]
+        pressure: "medium_pressure"  
+      - episodes: [700, 1000]
+        pressure: "high_pressure"
+
+# Analysis configuration
+analysis:
+  metrics_of_interest:
+    - "coordination_efficiency"
+    - "mutual_information"
+    - "communication_frequency"
+    - "protocol_complexity"
+    - "semantic_stability"
+    - "compositional_structure"
+  
+  statistical_tests:
+    - "wilcoxon_signed_rank"  # For paired comparisons
+    - "mann_whitney_u"        # For independent groups
+    - "kruskal_wallis"        # For multiple groups
+    - "effect_size_calculation"
+  
+  visualization:
+    - "emergence_timeline_plots"
+    - "communication_network_graphs"
+    - "attention_heatmaps"
+    - "protocol_complexity_evolution"
+    - "statistical_significance_plots"
+
+# Output configuration  
+output:
+  base_directory: "./research_results"
+  save_checkpoints: true
+  checkpoint_interval: 100
+  save_attention_weights: true
+  save_communication_logs: true
+  generate_reports: true
+  report_format: ["json", "html", "pdf"]
+
+# Computational configuration
+computation:
+  use_ray: true
+  ray_config:
+    num_workers: 4
+    worker_cpu: 2
+    worker_memory_gb: 4
+  fallback_mode: "simplified_training"
+  parallel_experiments: true
+  max_parallel_experiments: 3

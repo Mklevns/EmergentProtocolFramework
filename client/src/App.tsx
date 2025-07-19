@@ -9,6 +9,7 @@ import Dashboard from "@/pages/dashboard";
 import Training from "@/pages/training";
 import Visualization from "@/pages/visualization";
 import AdvancedLearning from "@/pages/AdvancedLearning";
+import ResearchDashboard from "@/pages/ResearchDashboard";
 
 function Router() {
   return (
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/training" component={Training} />
       <Route path="/visualization" component={Visualization} />
       <Route path="/advanced-learning" component={AdvancedLearning} />
+      <Route path="/research" component={ResearchDashboard} />
       <Route component={NotFound} />
     </Switch>
   );

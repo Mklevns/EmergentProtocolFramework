@@ -1507,5 +1507,266 @@ print(json.dumps(result))
   // Setup persistent training routes with database access
   setupPersistentTrainingRoutes(app, broadcast);
 
+  // Enhanced Research Framework API Routes
+  app.get('/api/research/status', async (req, res) => {
+    try {
+      const { spawn } = require('child_process');
+      const path = require('path');
+      
+      const pythonProcess = spawn('python3', ['-c', `
+import sys
+sys.path.append('${process.cwd()}/server/services')
+from enhanced_research_api import get_research_api
+import asyncio
+import json
+
+async def main():
+    api = get_research_api()
+    status = await api.get_research_status()
+    print(json.dumps(status))
+
+asyncio.run(main())
+`], { stdio: ['pipe', 'pipe', 'pipe'] });
+
+      let stdout = '';
+      let stderr = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code !== 0) {
+          console.error('Research API failed:', stderr);
+          return res.status(500).json({ error: 'Research framework unavailable', details: stderr });
+        }
+
+        try {
+          const status = JSON.parse(stdout.trim());
+          res.json(status);
+        } catch (parseError) {
+          console.error('Failed to parse research status:', parseError);
+          res.status(500).json({ error: 'Invalid response format' });
+        }
+      });
+    } catch (error) {
+      console.error('Research status error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.post('/api/research/experiments', async (req, res) => {
+    try {
+      const experimentConfig = req.body;
+      const { spawn } = require('child_process');
+      
+      const pythonProcess = spawn('python3', ['-c', `
+import sys
+sys.path.append('${process.cwd()}/server/services')
+from enhanced_research_api import get_research_api
+import asyncio
+import json
+
+async def main():
+    api = get_research_api()
+    config = ${JSON.stringify(experimentConfig)}
+    result = await api.create_experiment_from_config(config)
+    print(json.dumps(result))
+
+asyncio.run(main())
+`], { stdio: ['pipe', 'pipe', 'pipe'] });
+
+      let stdout = '';
+      let stderr = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code !== 0) {
+          console.error('Experiment creation failed:', stderr);
+          return res.status(500).json({ error: 'Failed to create experiment', details: stderr });
+        }
+
+        try {
+          const result = JSON.parse(stdout.trim());
+          if (result.success) {
+            broadcast({ type: 'research_experiment_created', data: result });
+          }
+          res.json(result);
+        } catch (parseError) {
+          console.error('Failed to parse experiment result:', parseError);
+          res.status(500).json({ error: 'Invalid response format' });
+        }
+      });
+    } catch (error) {
+      console.error('Experiment creation error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.post('/api/research/experiments/:id/run', async (req, res) => {
+    try {
+      const experimentId = req.params.id;
+      const { spawn } = require('child_process');
+      
+      const pythonProcess = spawn('python3', ['-c', `
+import sys
+sys.path.append('${process.cwd()}/server/services')
+from enhanced_research_api import get_research_api
+import asyncio
+import json
+
+async def main():
+    api = get_research_api()
+    result = await api.run_experiment('${experimentId}')
+    print(json.dumps(result))
+
+asyncio.run(main())
+`], { stdio: ['pipe', 'pipe', 'pipe'] });
+
+      let stdout = '';
+      let stderr = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code !== 0) {
+          console.error('Experiment execution failed:', stderr);
+          return res.status(500).json({ error: 'Experiment execution failed', details: stderr });
+        }
+
+        try {
+          const result = JSON.parse(stdout.trim());
+          if (result.success) {
+            broadcast({ type: 'research_experiment_completed', data: result });
+          }
+          res.json(result);
+        } catch (parseError) {
+          console.error('Failed to parse experiment result:', parseError);
+          res.status(500).json({ error: 'Invalid response format' });
+        }
+      });
+    } catch (error) {
+      console.error('Experiment execution error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.get('/api/research/experiments', async (req, res) => {
+    try {
+      const { spawn } = require('child_process');
+      
+      const pythonProcess = spawn('python3', ['-c', `
+import sys
+sys.path.append('${process.cwd()}/server/services')
+from enhanced_research_api import get_research_api
+import asyncio
+import json
+
+async def main():
+    api = get_research_api()
+    result = await api.list_experiments()
+    print(json.dumps(result))
+
+asyncio.run(main())
+`], { stdio: ['pipe', 'pipe', 'pipe'] });
+
+      let stdout = '';
+      let stderr = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code !== 0) {
+          console.error('Failed to list experiments:', stderr);
+          return res.status(500).json({ error: 'Failed to list experiments', details: stderr });
+        }
+
+        try {
+          const result = JSON.parse(stdout.trim());
+          res.json(result);
+        } catch (parseError) {
+          console.error('Failed to parse experiments list:', parseError);
+          res.status(500).json({ error: 'Invalid response format' });
+        }
+      });
+    } catch (error) {
+      console.error('List experiments error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.get('/api/research/hypotheses', async (req, res) => {
+    try {
+      const { spawn } = require('child_process');
+      
+      const pythonProcess = spawn('python3', ['-c', `
+import sys
+sys.path.append('${process.cwd()}/server/services')
+from enhanced_research_api import get_research_api
+import asyncio
+import json
+
+async def main():
+    api = get_research_api()
+    result = await api.get_hypothesis_validation_summary()
+    print(json.dumps(result))
+
+asyncio.run(main())
+`], { stdio: ['pipe', 'pipe', 'pipe'] });
+
+      let stdout = '';
+      let stderr = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      pythonProcess.on('close', (code) => {
+        if (code !== 0) {
+          console.error('Failed to get hypothesis summary:', stderr);
+          return res.status(500).json({ error: 'Failed to get hypothesis summary', details: stderr });
+        }
+
+        try {
+          const result = JSON.parse(stdout.trim());
+          res.json(result);
+        } catch (parseError) {
+          console.error('Failed to parse hypothesis summary:', parseError);
+          res.status(500).json({ error: 'Invalid response format' });
+        }
+      });
+    } catch (error) {
+      console.error('Hypothesis summary error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   return httpServer;
 }
