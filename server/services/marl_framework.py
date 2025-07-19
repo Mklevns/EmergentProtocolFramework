@@ -602,3 +602,8 @@ def initialize_framework():
 def get_framework():
     """Get the current framework instance"""
     return framework
+
+def create_environment(config):
+    """Environment factory for Ray integration"""
+    from .ray_integration import BioInspiredEnvironment
+    return BioInspiredEnvironment(config)
