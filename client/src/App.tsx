@@ -10,6 +10,7 @@ import Training from "@/pages/training";
 import Visualization from "@/pages/visualization";
 import AdvancedLearning from "@/pages/AdvancedLearning";
 import ResearchDashboard from "@/pages/ResearchDashboard";
+import Config from "@/pages/config";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/visualization" component={Visualization} />
       <Route path="/advanced-learning" component={AdvancedLearning} />
       <Route path="/research" component={ResearchDashboard} />
+      <Route path="/config" component={Config} />
       <Route component={NotFound} />
     </Switch>
   );
