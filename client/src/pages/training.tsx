@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { TrainingControls } from "@/components/TrainingControls";
 import { MetricsPanel } from "@/components/MetricsPanel";
 import { useWebSocket } from "@/hooks/useWebSocket";
-import { TrainingStatus, Experiment } from "@/lib/agent-types";
+import { TrainingStatus, Experiment, Metric } from "@/lib/agent-types";
 import { apiRequest } from "@/lib/queryClient";
 
 export default function Training() {
@@ -98,7 +98,7 @@ export default function Training() {
   });
   
   // Metrics query
-  const { data: metrics } = useQuery({
+  const { data: metrics } = useQuery<Metric[]>({
     queryKey: ['/api/metrics/experiment', selectedExperiment],
     enabled: selectedExperiment !== null,
     refetchInterval: 1000,
