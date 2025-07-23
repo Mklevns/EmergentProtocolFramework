@@ -217,6 +217,31 @@ class BioInspiredMultiAgentEnv(MultiAgentEnv):
         
         logger.info(f"BioInspiredMultiAgentEnv initialized with {self.num_agents} agents")
     
+    def observation_space_contains(self, x: Dict[str, np.ndarray]) -> bool:
+        """Check if the given observations are valid for all agents"""
+        if not isinstance(x, dict):
+            return False
+        
+        for agent_id in self._agent_ids:
+            if agent_id not in x:
+                continue  # Agent might not be present in this step
+            
+            if not self.observation_space.contains(x[agent_id]):
+                return False
+        
+        return True
+    
+    def action_space_sample(self, agent_ids: List[str] = None) -> Dict[str, int]:
+        """Sample random actions for the specified agents"""
+        if agent_ids is None:
+            agent_ids = self.agent_ids
+        
+        return {
+            agent_id: self.action_space.sample()
+            for agent_id in agent_ids
+            if agent_id in self._agent_ids
+        }
+    
     def _initialize_agent_positions(self) -> Dict[str, np.ndarray]:
         """Initialize agent positions in 3D grid"""
         positions = {}
