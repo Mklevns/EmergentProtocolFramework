@@ -526,13 +526,13 @@ class BioInspiredLearner(Learner):
         """Additional bio-inspired updates for the module"""
 
         # Apply neural plasticity updates
-        if hasattr(self.module[module_id], 'neural_plasticity')):
+        if hasattr(self.module[module_id], 'neural_plasticity'):
             self.module[module_id].neural_plasticity.update_plasticity(
                 self.neural_plasticity_rate
             )
 
         # Update pheromone attention weights
-        if hasattr(self.module[module_id], 'pheromone_attention')):
+        if hasattr(self.module[module_id], 'pheromone_attention'):
             self.module[module_id].pheromone_attention.decay_pheromones(
                 self.pheromone_decay
             )
