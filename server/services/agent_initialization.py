@@ -11,6 +11,8 @@ from typing import Dict, List, Tuple, Any
 from dataclasses import dataclass, asdict
 from enum import Enum
 
+from .communication_types import Position3D
+
 class AgentType(Enum):
     REGULAR = "regular"
     COORDINATOR = "coordinator"
@@ -21,14 +23,8 @@ class AgentStatus(Enum):
     PROCESSING = "processing"
     BREAKTHROUGH = "breakthrough"
 
-@dataclass
-class Agent3DPosition:
-    x: int
-    y: int
-    z: int
-    
-    def distance_to(self, other: 'Agent3DPosition') -> float:
-        return math.sqrt((self.x - other.x)**2 + (self.y - other.y)**2 + (self.z - other.z)**2)
+# Use Position3D from communication_types instead of Agent3DPosition
+Agent3DPosition = Position3D
 
 @dataclass
 class AgentConfig:

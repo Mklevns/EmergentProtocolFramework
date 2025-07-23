@@ -614,3 +614,220 @@ communication_protocol = CommunicationProtocol()
 def get_communication_protocol() -> CommunicationProtocol:
     """Get the global communication protocol instance"""
     return communication_protocol
+"""
+Communication Protocol Implementation
+Handles protocol logic and message processing using shared types
+"""
+
+from typing import Dict, List, Any, Optional
+import json
+import time
+import random
+
+from .communication_types import (
+    Message,
+    MessageType,
+    CommunicationPattern,
+    Agent,
+    Position3D,
+    CommunicationEvent
+)
+
+class CommunicationProtocol:
+    """Handles communication protocol logic and message routing"""
+    
+    def __init__(self):
+        self.active_protocols: Dict[str, Any] = {}
+        self.message_history: List[Message] = []
+        self.routing_cache: Dict[str, List[str]] = {}
+        
+    def create_message(
+        self, 
+        from_agent_id: str,
+        to_agent_id: str,
+        message_type: MessageType,
+        content: Dict[str, Any],
+        priority: float = 0.5
+    ) -> Message:
+        """Create a new message with proper formatting"""
+        
+        message = Message(
+            message_id=f"msg_{int(time.time() * 1000)}_{random.randint(1000, 9999)}",
+            from_agent_id=from_agent_id,
+            to_agent_id=to_agent_id,
+            message_type=message_type,
+            content=content,
+            memory_pointer=content.get('memory_pointer'),
+            priority=priority,
+            timestamp=time.time(),
+            ttl=10,
+            hop_count=0
+        )
+        
+        self.message_history.append(message)
+        return message
+    
+    def validate_message(self, message: Message) -> bool:
+        """Validate message structure and content"""
+        
+        if not message.message_id or not message.from_agent_id or not message.to_agent_id:
+            return False
+            
+        if message.ttl <= 0:
+            return False
+            
+        if not isinstance(message.content, dict):
+            return False
+            
+        return True
+    
+    def route_message(
+        self, 
+        message: Message,
+        agent_network: Dict[str, Agent]
+    ) -> List[str]:
+        """Calculate optimal route for message delivery"""
+        
+        if message.to_agent_id == "broadcast":
+            return self._get_broadcast_route(message.from_agent_id, agent_network)
+        
+        # Check for direct connection
+        sender = agent_network.get(message.from_agent_id)
+        if sender and message.to_agent_id in sender.neighbors:
+            return [message.from_agent_id, message.to_agent_id]
+        
+        # Use cached route if available
+        route_key = f"{message.from_agent_id}->{message.to_agent_id}"
+        if route_key in self.routing_cache:
+            return self.routing_cache[route_key]
+        
+        # Calculate new route
+        route = self._calculate_shortest_path(
+            message.from_agent_id,
+            message.to_agent_id,
+            agent_network
+        )
+        
+        self.routing_cache[route_key] = route
+        return route
+    
+    def _get_broadcast_route(
+        self, 
+        from_agent_id: str,
+        agent_network: Dict[str, Agent]
+    ) -> List[str]:
+        """Get broadcast route based on agent type and network"""
+        
+        sender = agent_network.get(from_agent_id)
+        if not sender:
+            return [from_agent_id]
+        
+        if sender.agent_type == "coordinator":
+            # Coordinators broadcast to their region
+            region_agents = [
+                aid for aid, agent in agent_network.items()
+                if agent.coordinator_id == from_agent_id or aid == from_agent_id
+            ]
+            return region_agents
+        else:
+            # Regular agents broadcast to neighbors
+            return [from_agent_id] + sender.neighbors
+    
+    def _calculate_shortest_path(
+        self,
+        start: str,
+        target: str,
+        agent_network: Dict[str, Agent]
+    ) -> List[str]:
+        """Calculate shortest path using BFS"""
+        
+        if start == target:
+            return [start]
+        
+        visited = set()
+        queue = [(start, [start])]
+        
+        while queue:
+            current, path = queue.pop(0)
+            
+            if current in visited:
+                continue
+                
+            visited.add(current)
+            
+            if current == target:
+                return path
+            
+            current_agent = agent_network.get(current)
+            if current_agent:
+                for neighbor in current_agent.neighbors:
+                    if neighbor not in visited:
+                        queue.append((neighbor, path + [neighbor]))
+        
+        # No path found, return direct attempt
+        return [start, target]
+    
+    def process_message_delivery(
+        self,
+        message: Message,
+        route: List[str],
+        agent_network: Dict[str, Agent]
+    ) -> CommunicationEvent:
+        """Process message delivery and return event"""
+        
+        success = True
+        latency = len(route) * 0.1  # Base latency
+        
+        # Check if all agents in route are active
+        for agent_id in route:
+            agent = agent_network.get(agent_id)
+            if not agent or not agent.is_active:
+                success = False
+                break
+        
+        # Add random factors
+        if random.random() < 0.05:  # 5% chance of failure
+            success = False
+        
+        latency += random.uniform(0.01, 0.1)  # Add jitter
+        
+        event = CommunicationEvent(
+            from_agent_id=message.from_agent_id,
+            to_agent_id=message.to_agent_id,
+            message_type=message.message_type.value,
+            timestamp=message.timestamp,
+            route=route,
+            success=success,
+            latency=latency
+        )
+        
+        return event
+    
+    def get_protocol_statistics(self) -> Dict[str, Any]:
+        """Get protocol performance statistics"""
+        
+        total_messages = len(self.message_history)
+        if total_messages == 0:
+            return {
+                "total_messages": 0,
+                "success_rate": 0.0,
+                "average_hops": 0.0,
+                "protocol_efficiency": 0.0
+            }
+        
+        # Calculate basic stats
+        message_types = {}
+        total_hops = 0
+        
+        for message in self.message_history:
+            msg_type = message.message_type.value
+            message_types[msg_type] = message_types.get(msg_type, 0) + 1
+            total_hops += message.hop_count
+        
+        return {
+            "total_messages": total_messages,
+            "message_types": message_types,
+            "average_hops": total_hops / total_messages,
+            "cache_size": len(self.routing_cache),
+            "protocol_efficiency": min(1.0, 100 / max(1, total_hops))
+        }
