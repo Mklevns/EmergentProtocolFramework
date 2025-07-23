@@ -1,0 +1,54 @@
+This is the same error as before. Your custom model, **`BioInspiredRLModule`**, is outputting a standard PyTorch action distribution, but **RLlib requires you to use its own special distribution wrappers**.
+
+The solution is to find where your model creates the action distribution and wrap it in RLlib's `TorchCategorical` class.
+
+-----
+
+## 🛠️ How to Fix the Error
+
+1.  **Add the Correct Import**: At the top of the file where `BioInspiredRLModule` is defined, make sure you have this import statement:
+
+    ```python
+    from ray.rllib.models.torch.torch_distribution import TorchCategorical
+    ```
+
+2.  **Modify the `forward_exploration` Method**: Find the `forward_exploration` method in your `BioInspiredRLModule` class and change how the action distribution is created.
+
+      * Your current code likely looks something like this:
+
+        ```python
+        # This is the OLD, incorrect way
+        from torch.distributions.categorical import Categorical
+
+        # ... inside your model ...
+        action_logits = self.your_action_layer(model_output)
+        action_dist = Categorical(logits=action_logits) # This is the wrong type!
+
+        return {"action_dist": action_dist}
+        ```
+
+      * Update it to use `TorchCategorical`:
+
+        ```python
+        # This is the NEW, correct way
+        from ray.rllib.models.torch.torch_distribution import TorchCategorical
+
+        # ... inside your model ...
+        action_logits = self.your_action_layer(model_output)
+        rllib_action_dist = TorchCategorical(logits=action_logits) # This is the correct RLlib type!
+
+        return {"action_dist": rllib_action_dist}
+        ```
+
+-----
+
+## ⚠️ A Note on the Warnings
+
+You are also seeing these warnings:
+
+```
+WARNING ... observation_space_sample() ... has not been implemented.
+WARNING ... action_space_contains() ... has not been implemented.
+```
+
+These are **not** causing the crash, but they indicate that your custom environment, `BioInspiredMultiAgentEnv`, is incomplete. To be fully compliant with RLlib, you should define your observation and action spaces as dictionaries that map each agent's ID to its individual space. This is standard practice for multi-agent environments and will resolve these warnings.
