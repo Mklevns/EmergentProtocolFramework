@@ -26,6 +26,11 @@ server_dir = os.path.dirname(os.path.dirname(__file__))
 if server_dir not in sys.path:
     sys.path.insert(0, server_dir)
 
+# Add project root to path for Ray workers
+project_root = os.path.dirname(server_dir)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 from services.marl_framework import PheromoneAttentionNetwork, NeuralPlasticityMemory, MARLFramework
 
 class NextGenBioInspiredRLModule(TorchRLModule):
@@ -365,7 +370,20 @@ class RayIntegrationManager:
         """Initialize Ray training"""
         try:
             import ray
-            ray.init(local_mode=True, ignore_reinit_error=True)
+            
+            # Configure runtime environment for workers
+            runtime_env = {
+                "py_modules": [os.path.dirname(os.path.dirname(__file__))],
+                "env_vars": {
+                    "PYTHONPATH": f"{os.path.dirname(os.path.dirname(os.path.dirname(__file__)))}:{os.path.dirname(os.path.dirname(__file__))}"
+                }
+            }
+            
+            ray.init(
+                local_mode=True, 
+                ignore_reinit_error=True,
+                runtime_env=runtime_env
+            )
             
             config = self.create_config()
             self.algorithm = config.build()
@@ -373,6 +391,8 @@ class RayIntegrationManager:
             return True
         except Exception as e:
             print(f"Error initializing Ray training: {e}")
+            import traceback
+            traceback.print_exc()
             return False
     
     def train_step(self) -> Dict[str, Any]:

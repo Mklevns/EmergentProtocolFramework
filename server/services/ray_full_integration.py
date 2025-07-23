@@ -6,6 +6,7 @@ Production-ready implementation for scalable bio-inspired MARL training
 import os
 import ray
 import torch
+import torch.nn as nn
 import numpy as np
 from typing import Dict, Any, Optional, List, Tuple
 import gymnasium as gym
@@ -38,6 +39,11 @@ server_dir = os.path.dirname(os.path.dirname(__file__))
 if server_dir not in sys.path:
     sys.path.insert(0, server_dir)
 
+# Add project root to path for Ray workers
+project_root = os.path.dirname(server_dir)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 # Import from communication_types to avoid circular imports
 from services.communication_types import Message, MessageType, Agent, Position3D
 from services.marl_framework import PheromoneAttentionNetwork, NeuralPlasticityMemory
@@ -48,6 +54,8 @@ class BioInspiredRLModule(TorchRLModule):
     """Bio-inspired RL Module with pheromone attention and neural plasticity"""
     
     def __init__(self, config: Dict[str, Any]):
+        # Ensure torch.nn is imported in worker processes
+        import torch.nn as nn
         super().__init__(config)
         
         # Extract configuration
@@ -509,19 +517,45 @@ class FullRayIntegration:
         
         # Initialize Ray if not already initialized
         if not ray.is_initialized():
+            # Configure runtime environment for Ray workers
+            runtime_env = {
+                "py_modules": [os.path.dirname(os.path.dirname(__file__))],  # Include server directory
+                "env_vars": {
+                    "PYTHONPATH": f"{os.path.dirname(os.path.dirname(os.path.dirname(__file__)))}:{os.path.dirname(os.path.dirname(__file__))}"
+                }
+            }
+            
             ray.init(
                 local_mode=False,
-                num_cpus=os.cpu_count(),
+                num_cpus=os.cpu_count() or 4,
                 object_store_memory=1000000000,  # 1GB
-                _temp_dir="/tmp/ray"
+                _temp_dir="/tmp/ray",
+                runtime_env=runtime_env,
+                ignore_reinit_error=True
             )
-            logger.info("Ray initialized successfully")
+            logger.info("Ray initialized successfully with runtime environment")
     
     def create_algorithm(self) -> Algorithm:
         """Create and configure the Ray Algorithm"""
         
-        # Register the environment
-        register_env("bio_inspired_marl", lambda config: BioInspiredMultiAgentEnv(config))
+        # Register the environment with proper worker initialization
+        def create_env(config):
+            # Ensure proper imports are available in worker processes
+            import sys
+            import os
+            
+            # Add paths for worker processes
+            server_dir = os.path.dirname(os.path.dirname(__file__))
+            project_root = os.path.dirname(server_dir)
+            
+            if server_dir not in sys.path:
+                sys.path.insert(0, server_dir)
+            if project_root not in sys.path:
+                sys.path.insert(0, project_root)
+            
+            return BioInspiredMultiAgentEnv(config)
+        
+        register_env("bio_inspired_marl", create_env)
         
         # Create algorithm configuration
         config = (
