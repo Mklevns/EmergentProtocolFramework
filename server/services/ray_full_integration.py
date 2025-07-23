@@ -30,8 +30,16 @@ from ray.rllib.env.env_context import EnvContext
 from ray.tune.registry import register_env
 
 # Bio-inspired components
-from .ray_integration import BioInspiredRLModule
-from .marl_framework import PheromoneAttentionNetwork, NeuralPlasticityMemory
+import sys
+import os
+
+# Add server directory to Python path for absolute imports  
+server_dir = os.path.dirname(os.path.dirname(__file__))
+if server_dir not in sys.path:
+    sys.path.insert(0, server_dir)
+
+from services.ray_integration import BioInspiredRLModule
+from services.marl_framework import PheromoneAttentionNetwork, NeuralPlasticityMemory
 
 logger = logging.getLogger(__name__)
 

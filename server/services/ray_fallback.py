@@ -95,8 +95,16 @@ class RayFallbackSystem:
             return self._fallback_training(config)
         
         try:
-            # Import Ray components
-            from .ray_api_integration import RayTrainingAPI
+            # Import Ray components with absolute imports
+            import sys
+            import os
+            
+            # Add server directory to Python path for absolute imports
+            server_dir = os.path.dirname(os.path.dirname(__file__))
+            if server_dir not in sys.path:
+                sys.path.insert(0, server_dir)
+                
+            from services.ray_api_integration import RayTrainingAPI
             
             # Create Ray training API
             ray_api = RayTrainingAPI()

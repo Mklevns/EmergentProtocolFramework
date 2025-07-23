@@ -18,7 +18,15 @@ from ray.rllib.models.torch.torch_distributions import TorchCategorical
 from ray.tune.registry import register_env
 import gymnasium as gym
 
-from .marl_framework import PheromoneAttentionNetwork, NeuralPlasticityMemory, MARLFramework
+import sys
+import os
+
+# Add server directory to Python path for absolute imports
+server_dir = os.path.dirname(os.path.dirname(__file__))
+if server_dir not in sys.path:
+    sys.path.insert(0, server_dir)
+
+from services.marl_framework import PheromoneAttentionNetwork, NeuralPlasticityMemory, MARLFramework
 
 class NextGenBioInspiredRLModule(TorchRLModule):
     """Bio-inspired RLModule integrating pheromone attention and neural plasticity"""

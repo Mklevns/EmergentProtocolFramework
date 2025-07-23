@@ -12,12 +12,20 @@ from typing import Dict, Any, Optional
 from pathlib import Path
 import traceback
 
-from .ray_training_orchestrator import (
+import sys
+import os
+
+# Add server directory to Python path for absolute imports
+server_dir = os.path.dirname(os.path.dirname(__file__))
+if server_dir not in sys.path:
+    sys.path.insert(0, server_dir)
+
+from services.ray_training_orchestrator import (
     RayTrainingOrchestrator, 
     create_ray_training_orchestrator,
     run_ray_training
 )
-from .ray_full_integration import RayTrainingConfig
+from services.ray_full_integration import RayTrainingConfig
 
 # Configure logging
 logging.basicConfig(
