@@ -29,6 +29,7 @@ from ray.rllib.utils.annotations import override
 from ray.rllib.env.multi_agent_env import MultiAgentEnv
 from ray.rllib.env.env_context import EnvContext
 from ray.tune.registry import register_env
+from ray.rllib.models.torch.torch_distribution import TorchCategorical
 
 # Bio-inspired components
 import sys
@@ -108,9 +109,8 @@ class BioInspiredRLModule(TorchRLModule):
         # Get action logits
         action_logits = self.policy_net(obs)
 
-        # Create categorical distribution from logits
-        from torch.distributions import Categorical
-        action_dist = Categorical(logits=action_logits)
+        # Create RLlib categorical distribution from logits
+        action_dist = TorchCategorical(logits=action_logits)
 
         return {"action_dist": action_dist}
 
@@ -136,9 +136,8 @@ class BioInspiredRLModule(TorchRLModule):
             enhanced_features = obs + 0.1 * torch.nn.functional.linear(attended_features, self.feature_projection.weight.t())
             action_logits = self.policy_net(enhanced_features)
 
-        # Create categorical distribution from logits
-        from torch.distributions import Categorical
-        action_dist = Categorical(logits=action_logits)
+        # Create RLlib categorical distribution from logits
+        action_dist = TorchCategorical(logits=action_logits)
 
         return {"action_dist": action_dist}
 
@@ -155,9 +154,8 @@ class BioInspiredRLModule(TorchRLModule):
         plasticity_factor = torch.sigmoid(self.plasticity_weights).mean()
         action_logits = action_logits * (1.0 + plasticity_factor * self.neural_plasticity_rate)
 
-        # Create categorical distribution from logits
-        from torch.distributions import Categorical
-        action_dist = Categorical(logits=action_logits)
+        # Create RLlib categorical distribution from logits
+        action_dist = TorchCategorical(logits=action_logits)
 
         return {
             "action_dist": action_dist,
@@ -260,6 +258,31 @@ class BioInspiredMultiAgentEnv(MultiAgentEnv):
             for agent_id in agent_ids
             if agent_id in self._agent_ids
         }
+
+    def observation_space_sample(self, agent_ids: List[str] = None) -> Dict[str, np.ndarray]:
+        """Sample random observations for the specified agents"""
+        if agent_ids is None:
+            agent_ids = self.agent_ids
+
+        return {
+            agent_id: self.observation_space.sample()
+            for agent_id in agent_ids
+            if agent_id in self._agent_ids
+        }
+
+    def action_space_contains(self, x: Dict[str, int]) -> bool:
+        """Check if the given actions are valid for all agents"""
+        if not isinstance(x, dict):
+            return False
+
+        for agent_id in self._agent_ids:
+            if agent_id not in x:
+                continue  # Agent might not be present in this step
+
+            if not self.action_space.contains(x[agent_id]):
+                return False
+
+        return True
 
     def _initialize_agent_positions(self) -> Dict[str, np.ndarray]:
         """Initialize agent positions in 3D grid"""
