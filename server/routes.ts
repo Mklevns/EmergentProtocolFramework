@@ -645,16 +645,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const rayResult = JSON.parse(lastJsonLine);
               
               if (rayResult.success) {
-                // Update experiment with Ray results
-                await storage.updateExperimentMetrics(experiment.id, rayResult.result.final_metrics);
+                // Handle both Ray RLlib and fallback system results
+                const finalMetrics = rayResult.result?.final_metrics || rayResult.metrics;
+                
+                if (finalMetrics) {
+                  await storage.updateExperimentMetrics(experiment.id, finalMetrics);
+                }
                 await storage.updateExperimentStatus(experiment.id, 'completed');
                 
                 broadcast({ 
                   type: 'ray_training_completed', 
                   data: { 
                     experimentId: experiment.id, 
-                    metrics: rayResult.result.final_metrics,
-                    trainingMethod: 'ray_rllib'
+                    metrics: finalMetrics,
+                    trainingMethod: rayResult.ray_available ? 'ray_rllib' : 'fallback',
+                    message: rayResult.message
                   } 
                 });
               } else {
