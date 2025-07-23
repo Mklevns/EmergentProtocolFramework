@@ -12,7 +12,7 @@ from typing import Dict, Any, Optional, List, Tuple
 import gymnasium as gym
 from gymnasium.spaces import Box, Discrete, Dict as DictSpace
 import logging
-from dataclasses importdataclass
+from dataclasses import dataclass
 from pathlib import Path
 import json
 import time
