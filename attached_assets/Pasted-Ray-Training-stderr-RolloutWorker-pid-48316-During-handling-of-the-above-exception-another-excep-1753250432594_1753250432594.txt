@@ -1,0 +1,39 @@
+Ray Training stderr: (RolloutWorker pid=48316) During handling of the above exception, another exception occurred: [repeated 2x across cluster]
+(RolloutWorker pid=48316) ray::RolloutWorker.__init__() (pid=48316, ip=172.23.15.241, actor_id=27a1bfed23568d1792b0ba2601000000, repr=<ray.rllib.evaluation.rollout_worker.RolloutWorker object at 0x7ec5fcc43e10>) [repeated 2x across cluster]
+(RolloutWorker pid=48316)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/models/specs/checker.py", line 162, in _validate [repeated 2x across cluster]
+(RolloutWorker pid=48316)     spec.validate(data)
+(RolloutWorker pid=48316)     raise ValueError(
+(RolloutWorker pid=48316) ValueError: Mismatch found in data element ('action_dist',), which is a TensorSpec: Expected data type <class 'ray.rllib.models.distributions.Distribution'> but found <class 'torch.Tensor'>
+(RolloutWorker pid=48316)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(RolloutWorker pid=48316)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [repeated 3x across cluster]
+(RolloutWorker pid=48316)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/algorithms/ppo/ppo_torch_policy.py", line 64, in __init__ [repeated 2x across cluster]
+(RolloutWorker pid=48316)     self._update_policy_map(policy_dict=self.policy_dict)
+(RolloutWorker pid=48316)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 1746, in _update_policy_map
+(RolloutWorker pid=48316)     self._build_policy_map(
+(RolloutWorker pid=48316)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 1857, in _build_policy_map
+(RolloutWorker pid=48316)     new_policy = create_policy_for_framework(
+(RolloutWorker pid=48316)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [repeated 2x across cluster]
+(RolloutWorker pid=48316)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/utils/policy.py", line 141, in create_policy_for_framework
+(RolloutWorker pid=48316)     return policy_class(observation_space, action_space, merged_config)
+(RolloutWorker pid=48316)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(RolloutWorker pid=48316)     self._initialize_loss_from_dummy_batch()
+(RolloutWorker pid=48316)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/policy/policy.py", line 1430, in _initialize_loss_from_dummy_batch
+(RolloutWorker pid=48316)     actions, state_outs, extra_outs = self.compute_actions_from_input_dict(
+(RolloutWorker pid=48316)                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(RolloutWorker pid=48316)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/policy/torch_policy_v2.py", line 552, in compute_actions_from_input_dict
+(RolloutWorker pid=48316)     return self._compute_action_helper(
+(RolloutWorker pid=48316)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/models/specs/checker.py", line 371, in wrapper [repeated 4x across cluster]
+(RolloutWorker pid=48316)     return func(self, *a, **k)
+(RolloutWorker pid=48316)            ^^^^^^^^^^^^^^^^^^^
+(RolloutWorker pid=48316)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/policy/torch_policy_v2.py", line 1208, in _compute_action_helper
+(RolloutWorker pid=48316)     fwd_out = self.model.forward_exploration(input_dict)
+(RolloutWorker pid=48316)               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(RolloutWorker pid=48316)     raise e
+(RolloutWorker pid=48316)     return func(self, input_data, **kwargs)
+(RolloutWorker pid=48316)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(RolloutWorker pid=48316)     _validate(
+(RolloutWorker pid=48316)     raise SpecCheckingError(
+(RolloutWorker pid=48316) ray.rllib.core.models.specs.checker.SpecCheckingError: output spec validation failed on BioInspiredRLModule.forward_exploration, Mismatch found in data element ('action_dist',), which is a TensorSpec: Expected data type <class 'ray.rllib.models.distributions.Distribution'> but found <class 'torch.Tensor'>.
+
+10:59:54 PM [express] GET /api/experiments 304 in 0ms :: [{"name":"test","description":"Bio-inspired …
+10:59:54 PM [express] GET /api/metrics/experiment/1 304 in 0ms :: []
