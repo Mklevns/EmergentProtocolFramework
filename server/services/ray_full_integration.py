@@ -1438,6 +1438,12 @@ class FullRayIntegration:
                 )
             )
             .training(
+                lr=self.config.learning_rate,
+                train_batch_size=self.config.train_batch_size,
+                sgd_minibatch_size=self.config.sgd_minibatch_size,
+                num_sgd_iter=self.config.num_sgd_iter,
+                gamma=self.config.gamma,
+                lambda_=self.config.lambda_,
                 _enable_rl_module_api=True  # Critical: Enable modern RLModule API
             )
             .rollouts(
