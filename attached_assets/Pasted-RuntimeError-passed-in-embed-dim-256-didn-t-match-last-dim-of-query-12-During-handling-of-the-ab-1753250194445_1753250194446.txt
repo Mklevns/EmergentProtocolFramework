@@ -1,0 +1,80 @@
+RuntimeError: passed-in embed_dim 256 didn't match last dim of query 12
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_api_integration.py", line 62, in start_ray_training
+    result = await self.current_orchestrator.train()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_training_orchestrator.py", line 114, in train
+    return await self._train_with_ray()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_training_orchestrator.py", line 141, in _train_with_ray
+    algorithm = self.ray_integration.create_algorithm()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_full_integration.py", line 643, in create_algorithm
+    self.algorithm = config.build()
+                     ^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/algorithms/algorithm_config.py", line 1137, in build
+    return algo_class(
+           ^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/algorithms/algorithm.py", line 516, in __init__
+    super().__init__(
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/tune/trainable/trainable.py", line 161, in __init__
+    self.setup(copy.deepcopy(self.config))
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/algorithms/algorithm.py", line 638, in setup
+    self.workers = WorkerSet(
+                   ^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/worker_set.py", line 181, in __init__
+    raise e.args[0].args[2]
+RuntimeError: passed-in embed_dim 256 didn't match last dim of query 12
+
+
+Ray Training stderr: (RolloutWorker pid=44492) INFO:services.marl_framework:MARL Framework initialized [repeated 3x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/ray-logging.html#log-deduplication for more options.)
+(RolloutWorker pid=44492) INFO:services.ray_full_integration:BioInspiredMultiAgentEnv initialized with 30 agents [repeated 3x across cluster]
+
+Ray Training stderr: (RolloutWorker pid=44492) 2025-07-22 22:56:14,992  ERROR checker.py:258 -- Exception passed-in embed_dim 256 didn't match last dim of query 12 raised on function call without checkin input specs. RLlib will now attempt to check the spec before calling the function again.
+(RolloutWorker pid=44492) Exception raised in creation task: The actor died because of an error raised in its creation task, ray::RolloutWorker.__init__() (pid=44492, ip=172.23.15.241, actor_id=ef22102bfeaf654f2312220501000000, repr=<ray.rllib.evaluation.rollout_worker.RolloutWorker object at 0x74470cafffd0>)
+(RolloutWorker pid=44492)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(RolloutWorker pid=44492)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [repeated 3x across cluster]
+(RolloutWorker pid=44492)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/algorithms/ppo/ppo_torch_policy.py", line 64, in __init__ [repeated 2x across cluster]
+(RolloutWorker pid=44492)     self._update_policy_map(policy_dict=self.policy_dict)
+(RolloutWorker pid=44492)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 1746, in _update_policy_map
+(RolloutWorker pid=44492)     self._build_policy_map(
+(RolloutWorker pid=44492)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 1857, in _build_policy_map
+(RolloutWorker pid=44492)     new_policy = create_policy_for_framework(
+(RolloutWorker pid=44492)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [repeated 2x across cluster]
+(RolloutWorker pid=44492)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/utils/policy.py", line 141, in create_policy_for_framework
+(RolloutWorker pid=44492)     return policy_class(observation_space, action_space, merged_config)
+(RolloutWorker pid=44492)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(RolloutWorker pid=44492)     self._initialize_loss_from_dummy_batch()
+(RolloutWorker pid=44492)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/policy/policy.py", line 1430, in _initialize_loss_from_dummy_batch
+(RolloutWorker pid=44492)     actions, state_outs, extra_outs = self.compute_actions_from_input_dict(
+(RolloutWorker pid=44492)                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(RolloutWorker pid=44492)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/policy/torch_policy_v2.py", line 552, in compute_actions_from_input_dict
+(RolloutWorker pid=44492)     return self._compute_action_helper(
+(RolloutWorker pid=44492)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/models/specs/checker.py", line 361, in wrapper [repeated 4x across cluster]
+(RolloutWorker pid=44492)     return func(self, *a, **k)
+(RolloutWorker pid=44492)            ^^^^^^^^^^^^^^^^^^^
+(RolloutWorker pid=44492)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/policy/torch_policy_v2.py", line 1208, in _compute_action_helper
+(RolloutWorker pid=44492)     fwd_out = self.model.forward_exploration(input_dict)
+(RolloutWorker pid=44492)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [repeated 2x across cluster]
+(RolloutWorker pid=44492)     raise initial_exception
+(RolloutWorker pid=44492)     return func(self, input_data, **kwargs)
+(RolloutWorker pid=44492)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ [repeated 3x across cluster]
+(RolloutWorker pid=44492)     output_data = func(self, input_data, **kwargs)
+(RolloutWorker pid=44492)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 633, in forward_exploration
+(RolloutWorker pid=44492)     return self._forward_exploration(batch, **kwargs)
+(RolloutWorker pid=44492)   File "/home/micha/EmergentProtocolFramework/server/services/ray_full_integration.py", line 121, in _forward_exploration
+(RolloutWorker pid=44492)     attended_obs, _ = self.pheromone_attention(obs_expanded, obs_expanded, obs_expanded)
+(RolloutWorker pid=44492)                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(RolloutWorker pid=44492)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+(RolloutWorker pid=44492)     return self._call_impl(*args, **kwargs)
+(RolloutWorker pid=44492)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+
+Ray Training stderr: (RolloutWorker pid=44492)     return forward_call(*args, **kwargs)
+(RolloutWorker pid=44492)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(RolloutWorker pid=44492)   File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/torch/nn/modules/activation.py", line 1308, in forward
+(RolloutWorker pid=44492)     return torch._native_multi_head_attention(
+(RolloutWorker pid=44492)            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+(RolloutWorker pid=44492) RuntimeError: passed-in embed_dim 256 didn't match last dim of query 12
