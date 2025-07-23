@@ -53,20 +53,21 @@ logger = logging.getLogger(__name__)
 class BioInspiredRLModule(TorchRLModule):
     """Bio-inspired RL Module with pheromone attention and neural plasticity"""
     
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config):
         # Ensure torch.nn is imported in worker processes
         import torch.nn as nn
         super().__init__(config)
         
-        # Extract configuration
-        self.hidden_dim = config.get("hidden_dim", 256)
-        self.num_heads = config.get("num_heads", 8)
-        self.pheromone_decay = config.get("pheromone_decay", 0.95)
-        self.neural_plasticity_rate = config.get("neural_plasticity_rate", 0.1)
+        # Extract configuration from the config object's model_config_dict
+        model_config = getattr(config, 'model_config_dict', {})
+        self.hidden_dim = model_config.get("hidden_dim", 256)
+        self.num_heads = model_config.get("num_heads", 8)
+        self.pheromone_decay = model_config.get("pheromone_decay", 0.95)
+        self.neural_plasticity_rate = model_config.get("neural_plasticity_rate", 0.1)
         
         # Build network layers
-        obs_dim = config["observation_space"].shape[0]
-        action_dim = config["action_space"].n
+        obs_dim = config.observation_space.shape[0]
+        action_dim = config.action_space.n
         
         # Policy network
         self.policy_net = nn.Sequential(
@@ -583,8 +584,6 @@ class FullRayIntegration:
                             observation_space=Box(low=-np.inf, high=np.inf, shape=(12,), dtype=np.float32),
                             action_space=Discrete(5),
                             model_config_dict={
-                                "observation_space": Box(low=-np.inf, high=np.inf, shape=(12,), dtype=np.float32),
-                                "action_space": Discrete(5),
                                 "hidden_dim": self.config.hidden_dim,
                                 "num_heads": self.config.num_attention_heads,
                                 "pheromone_decay": self.config.pheromone_decay,
