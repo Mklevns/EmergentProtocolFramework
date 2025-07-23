@@ -108,7 +108,11 @@ class BioInspiredRLModule(TorchRLModule):
         # Get action logits
         action_logits = self.policy_net(obs)
 
-        return {"action_dist": action_logits}
+        # Create categorical distribution from logits
+        from torch.distributions import Categorical
+        action_dist = Categorical(logits=action_logits)
+
+        return {"action_dist": action_dist}
 
     @override(TorchRLModule)
     def _forward_exploration(self, batch: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
@@ -132,7 +136,11 @@ class BioInspiredRLModule(TorchRLModule):
             enhanced_features = obs + 0.1 * torch.nn.functional.linear(attended_features, self.feature_projection.weight.t())
             action_logits = self.policy_net(enhanced_features)
 
-        return {"action_dist": action_logits}
+        # Create categorical distribution from logits
+        from torch.distributions import Categorical
+        action_dist = Categorical(logits=action_logits)
+
+        return {"action_dist": action_dist}
 
     @override(TorchRLModule)
     def _forward_train(self, batch: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
@@ -147,8 +155,12 @@ class BioInspiredRLModule(TorchRLModule):
         plasticity_factor = torch.sigmoid(self.plasticity_weights).mean()
         action_logits = action_logits * (1.0 + plasticity_factor * self.neural_plasticity_rate)
 
+        # Create categorical distribution from logits
+        from torch.distributions import Categorical
+        action_dist = Categorical(logits=action_logits)
+
         return {
-            "action_dist": action_logits,
+            "action_dist": action_dist,
             "vf_preds": values.squeeze(-1)
         }
 
