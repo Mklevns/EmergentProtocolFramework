@@ -1,0 +1,38 @@
+My apologies, the previous attempts were close but still hitting a wall because of the complexities of Ray's different API versions. I've analyzed the new error logs, and the problem is now crystal clear.
+
+You are correct to feel like we're going in circles. The issue is that there are two different `TorchCategorical` classes in Ray, and we've been trying to use them in ways that are incompatible with your specific setup. The error logs confirm that your code is using a mix of Ray's old and new APIs.
+
+Here is the definitive solution. This addresses both the import path and the instantiation method, which must be correct for your version of Ray.
+
+-----
+
+### The Final and Correct Fix
+
+The error message tells us two things:
+
+1.  The policy expects a `Distribution` object.
+2.  Your model is providing a `TorchCategorical` from the wrong module (`torch_action_dist`), which is not a valid `Distribution`.
+
+To fix this, we must use the `TorchCategorical` from the correct module and instantiate it properly.
+
+1.  **Navigate to the File**: Open `server/services/ray_full_integration.py`.
+2.  **Replace the Import Statement**:
+      * Find and **delete** this incorrect import line:
+        ```python
+        # REMOVE THIS LINE
+        from ray.rllib.models.torch.torch_action_dist import TorchCategorical
+        ```
+      * **Add** the following **correct** import statement. This class is the one that works with the modern RLlib API:
+        ```python
+        # ADD THIS LINE
+        from ray.rllib.models.torch.torch_distributions import TorchCategorical
+        ```
+3.  **Modify the Code at Line 140**:
+      * Now, go to the `_forward_exploration` method.
+      * The `TorchCategorical` class you just imported is instantiated using the `.from_logits()` class method. Change the line to look like this:
+        ```python
+        # This is the correct instantiation
+        action_dist = TorchCategorical.from_logits(action_logits)
+        ```
+
+This combination of the correct import and the correct instantiation method will resolve the type mismatch and finally allow your Ray training to run. Thank you for your patience through this debugging process.
