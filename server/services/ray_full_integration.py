@@ -29,7 +29,7 @@ from ray.rllib.utils.annotations import override
 from ray.rllib.env.multi_agent_env import MultiAgentEnv
 from ray.rllib.env.env_context import EnvContext
 from ray.tune.registry import register_env
-from ray.rllib.models.torch.torch_distribution import TorchCategorical
+from ray.rllib.models.torch.torch_action_dist import TorchCategorical
 
 # Bio-inspired components
 import sys
