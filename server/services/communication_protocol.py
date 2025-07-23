@@ -16,9 +16,8 @@ from collections import defaultdict, deque
 import threading
 from concurrent.futures import ThreadPoolExecutor
 
-from .shared_memory import SharedMemorySystem, VectorType, get_shared_memory
-from .agent_network import AgentNetworkManager, get_network_manager
-from .advanced_communication import EnhancedCommunicationProtocol, get_enhanced_communication_protocol
+# Import shared types to avoid circular imports
+from .communication_types import Message, MessageType, Agent, Position3D
 
 logger = logging.getLogger(__name__)
 
@@ -145,8 +144,9 @@ class CommunicationProtocol:
     """Main communication protocol handler"""
     
     def __init__(self):
-        self.shared_memory = get_shared_memory()
-        self.network_manager = get_network_manager()
+        # Initialize without circular dependencies
+        self.shared_memory = None  # Will be set later if needed
+        self.network_manager = None  # Will be set later if needed
         
         # Message queues for each agent
         self.agent_queues: Dict[str, MessageQueue] = {}

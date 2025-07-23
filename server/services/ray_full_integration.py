@@ -38,10 +38,103 @@ server_dir = os.path.dirname(os.path.dirname(__file__))
 if server_dir not in sys.path:
     sys.path.insert(0, server_dir)
 
-from services.ray_integration import BioInspiredRLModule
+# Import from communication_types to avoid circular imports
+from services.communication_types import Message, MessageType, Agent, Position3D
 from services.marl_framework import PheromoneAttentionNetwork, NeuralPlasticityMemory
 
 logger = logging.getLogger(__name__)
+
+class BioInspiredRLModule(TorchRLModule):
+    """Bio-inspired RL Module with pheromone attention and neural plasticity"""
+    
+    def __init__(self, config: Dict[str, Any]):
+        super().__init__(config)
+        
+        # Extract configuration
+        self.hidden_dim = config.get("hidden_dim", 256)
+        self.num_heads = config.get("num_heads", 8)
+        self.pheromone_decay = config.get("pheromone_decay", 0.95)
+        self.neural_plasticity_rate = config.get("neural_plasticity_rate", 0.1)
+        
+        # Build network layers
+        obs_dim = config["observation_space"].shape[0]
+        action_dim = config["action_space"].n
+        
+        # Policy network
+        self.policy_net = nn.Sequential(
+            nn.Linear(obs_dim, self.hidden_dim),
+            nn.ReLU(),
+            nn.Linear(self.hidden_dim, self.hidden_dim),
+            nn.ReLU(),
+            nn.Linear(self.hidden_dim, action_dim)
+        )
+        
+        # Value network
+        self.value_net = nn.Sequential(
+            nn.Linear(obs_dim, self.hidden_dim),
+            nn.ReLU(),
+            nn.Linear(self.hidden_dim, self.hidden_dim),
+            nn.ReLU(),
+            nn.Linear(self.hidden_dim, 1)
+        )
+        
+        # Bio-inspired components
+        self.pheromone_attention = nn.MultiheadAttention(
+            embed_dim=self.hidden_dim,
+            num_heads=self.num_heads,
+            batch_first=True
+        )
+        
+        # Neural plasticity memory
+        self.plasticity_weights = nn.Parameter(torch.ones(self.hidden_dim) * 0.1)
+    
+    @override(TorchRLModule)
+    def _forward_inference(self, batch: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
+        """Forward pass for inference"""
+        obs = batch["obs"]
+        
+        # Get action logits
+        action_logits = self.policy_net(obs)
+        
+        return {"action_dist_inputs": action_logits}
+    
+    @override(TorchRLModule)
+    def _forward_exploration(self, batch: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
+        """Forward pass for exploration"""
+        obs = batch["obs"]
+        
+        # Get action logits with exploration
+        action_logits = self.policy_net(obs)
+        
+        # Apply pheromone attention (simplified)
+        if obs.dim() == 2:
+            obs_expanded = obs.unsqueeze(1)
+            attended_obs, _ = self.pheromone_attention(obs_expanded, obs_expanded, obs_expanded)
+            attended_obs = attended_obs.squeeze(1)
+            
+            # Combine original and attended features
+            enhanced_features = obs + 0.1 * attended_obs
+            action_logits = self.policy_net(enhanced_features)
+        
+        return {"action_dist_inputs": action_logits}
+    
+    @override(TorchRLModule)
+    def _forward_train(self, batch: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
+        """Forward pass for training"""
+        obs = batch["obs"]
+        
+        # Get action logits and values
+        action_logits = self.policy_net(obs)
+        values = self.value_net(obs)
+        
+        # Apply neural plasticity
+        plasticity_factor = torch.sigmoid(self.plasticity_weights).mean()
+        action_logits = action_logits * (1.0 + plasticity_factor * self.neural_plasticity_rate)
+        
+        return {
+            "action_dist_inputs": action_logits,
+            "vf_preds": values.squeeze(-1)
+        }
 
 @dataclass
 class RayTrainingConfig:
@@ -456,6 +549,8 @@ class FullRayIntegration:
                             observation_space=Box(low=-np.inf, high=np.inf, shape=(12,), dtype=np.float32),
                             action_space=Discrete(5),
                             model_config_dict={
+                                "observation_space": Box(low=-np.inf, high=np.inf, shape=(12,), dtype=np.float32),
+                                "action_space": Discrete(5),
                                 "hidden_dim": self.config.hidden_dim,
                                 "num_heads": self.config.num_attention_heads,
                                 "pheromone_decay": self.config.pheromone_decay,
