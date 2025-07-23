@@ -693,14 +693,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/training/ray/config-template', async (req, res) => {
     try {
       const pythonPath = path.join(process.cwd(), 'server/services/ray_fallback.py');
-      const pythonProcess = spawn('python3', ['-c', `
-import sys
-sys.path.append('${process.cwd()}')
-from server.services.ray_fallback import ray_fallback_system
-import json
-template = ray_fallback_system.create_config_template()
-print(json.dumps(template))
-      `], {
+      const pythonProcess = spawn('python3', [pythonPath], {
         stdio: ['pipe', 'pipe', 'pipe'],
         cwd: process.cwd(),
         env: { ...process.env, PYTHONPATH: process.cwd() }

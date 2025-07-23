@@ -7,6 +7,7 @@ Provides graceful fallback when Ray RLlib is not available
 import json
 import sys
 import logging
+import asyncio
 from typing import Dict, Any, Optional
 from pathlib import Path
 import time
@@ -19,15 +20,30 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Check Ray availability
+# Check Ray availability with better error handling
 RAY_AVAILABLE = False
+RAY_ERROR = None
 try:
     import ray
     from ray.rllib.algorithms.ppo import PPO, PPOConfig
     RAY_AVAILABLE = True
     logger.info("✅ Ray RLlib is available")
-except (ImportError, OSError) as e:
-    logger.warning(f"⚠️  Ray RLlib not available: {e}")
+except ImportError as e:
+    RAY_ERROR = f"Import error: {str(e)}"
+    logger.warning(f"⚠️  Ray RLlib not available - Import error: {e}")
+    logger.info("🔄 Using fallback training system")
+except AttributeError as e:
+    # Handle PyArrow compatibility issues
+    if "PyExtensionType" in str(e):
+        RAY_ERROR = "PyArrow compatibility issue - please update PyArrow to a compatible version"
+        logger.warning(f"⚠️  Ray RLlib not available - PyArrow compatibility issue: {e}")
+    else:
+        RAY_ERROR = f"Attribute error: {str(e)}"
+        logger.warning(f"⚠️  Ray RLlib not available - Attribute error: {e}")
+    logger.info("🔄 Using fallback training system")
+except Exception as e:
+    RAY_ERROR = f"Unexpected error: {str(e)}"
+    logger.warning(f"⚠️  Ray RLlib not available - Unexpected error: {e}")
     logger.info("🔄 Using fallback training system")
 
 class RayFallbackSystem:
@@ -35,6 +51,7 @@ class RayFallbackSystem:
     
     def __init__(self):
         self.ray_available = RAY_AVAILABLE
+        self.ray_error = RAY_ERROR
         self.logger = logging.getLogger(__name__)
         
     def create_config_template(self) -> Dict[str, Any]:
@@ -42,6 +59,7 @@ class RayFallbackSystem:
         template = {
             "success": True,
             "ray_available": self.ray_available,
+            "ray_error": self.ray_error if not self.ray_available else None,
             "config_template": {
                 "name": "Ray RLlib Bio-Inspired Training",
                 "description": "Advanced multi-agent reinforcement learning with bio-inspired components",
@@ -83,9 +101,15 @@ class RayFallbackSystem:
             # Create Ray training API
             ray_api = RayTrainingAPI()
             
-            # Start Ray training
-            result = ray_api.start_ray_training(config)
-            return result
+            # Start Ray training (handle async call)
+            try:
+                loop = asyncio.get_event_loop()
+                result = loop.run_until_complete(ray_api.start_ray_training(config))
+                return result
+            except RuntimeError:
+                # If no event loop exists, create one
+                result = asyncio.run(ray_api.start_ray_training(config))
+                return result
             
         except Exception as e:
             self.logger.error(f"Ray training failed: {e}")
@@ -155,8 +179,48 @@ class RayFallbackSystem:
         print(json.dumps(final_result))
         return training_result
 
-# Global instance
+# Create a global instance for easy access
 ray_fallback_system = RayFallbackSystem()
+
+def main():
+    """Main entry point for command-line usage"""
+    
+    try:
+        # Read configuration from stdin
+        config_input = sys.stdin.read()
+        
+        if not config_input.strip():
+            # No input, return config template
+            template = ray_fallback_system.create_config_template()
+            print(json.dumps(template))
+            return
+        
+        # Parse configuration
+        config = json.loads(config_input)
+        
+        # Start training
+        result = ray_fallback_system.start_training(config)
+        
+        # Output final result
+        print(json.dumps(result))
+        
+    except Exception as e:
+        logger.error(f"Ray fallback system error: {e}")
+        traceback.print_exc()
+        
+        error_result = {
+            "success": False,
+            "error": str(e),
+            "ray_available": ray_fallback_system.ray_available,
+            "ray_error": ray_fallback_system.ray_error,
+            "message": "Training failed with error",
+            "timestamp": time.time()
+        }
+        
+        print(json.dumps(error_result))
+
+if __name__ == "__main__":
+    main()
 
 def main():
     """Main entry point for command-line usage"""

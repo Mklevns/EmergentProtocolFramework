@@ -1,0 +1,202 @@
+(.venv) micha@MikePC:~/EmergentProtocolFramework$ npm run dev
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+Using in-memory storage (no DATABASE_URL configured)
+9:52:40 PM [express] serving on port 5000
+Client connected to WebSocket
+Client connected to WebSocket
+9:53:04 PM [express] GET /api/metrics/experiment/45 304 in 3ms :: []
+9:53:04 PM [express] GET /api/experiments 200 in 2ms :: []
+9:53:04 PM [express] GET /api/training/status 304 in 1ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:05 PM [express] GET /api/metrics/experiment/45 304 in 1ms :: []
+Client disconnected from WebSocket
+Client disconnected from WebSocket
+Browserslist: browsers data (caniuse-lite) is 9 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+9:53:07 PM [express] GET /api/training/status 304 in 1ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:07 PM [express] GET /api/experiments 304 in 1ms :: []
+Client connected to WebSocket
+9:53:09 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:11 PM [express] GET /api/training/status 304 in 1ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:12 PM [express] GET /api/experiments 304 in 1ms :: []
+9:53:13 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:15 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":null,"currentEpisode":0,"c…
+Client disconnected from WebSocket
+9:53:16 PM [express] GET /api/grid 200 in 1ms :: {"agents":[],"communicationPatterns":[],"activeMess…
+9:53:16 PM [express] GET /api/memory 304 in 1ms :: {"vectors":[],"usage":{"total":1000,"used":0,"eff…
+9:53:16 PM [express] GET /api/breakthroughs 304 in 1ms :: []
+9:53:16 PM [express] GET /api/communication-patterns 304 in 0ms :: []
+9:53:16 PM [express] GET /api/metrics 304 in 1ms :: []
+Client connected to WebSocket
+9:53:17 PM [express] GET /api/metrics 304 in 0ms :: []
+9:53:18 PM [express] POST /api/init-agents 200 in 77ms :: {"success":true,"message":"Agents initiali…
+9:53:18 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:18 PM [express] GET /api/grid 200 in 1ms :: {"agents":[{"agentId":"agent_00","type":"regular","…
+9:53:18 PM [express] GET /api/memory 304 in 1ms :: {"vectors":[],"usage":{"total":1000,"used":0,"eff…
+9:53:18 PM [express] GET /api/breakthroughs 304 in 0ms :: []
+9:53:18 PM [express] GET /api/communication-patterns 304 in 1ms :: []
+9:53:18 PM [express] GET /api/metrics 304 in 0ms :: []
+Client connected to WebSocket
+9:53:19 PM [express] GET /api/metrics 304 in 0ms :: []
+9:53:20 PM [express] GET /api/training/status 304 in 1ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:20 PM [express] GET /api/metrics 304 in 0ms :: []
+9:53:21 PM [express] GET /api/memory 304 in 1ms :: {"vectors":[],"usage":{"total":1000,"used":0,"eff…
+9:53:21 PM [express] GET /api/metrics 304 in 0ms :: []
+9:53:21 PM [express] POST /api/simulate-communication 200 in 45ms :: {"success":true,"message":"Comm…
+9:53:21 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:21 PM [express] GET /api/grid 200 in 1ms :: {"agents":[{"agentId":"agent_00","type":"regular","…
+9:53:21 PM [express] GET /api/memory 304 in 1ms :: {"vectors":[],"usage":{"total":1000,"used":0,"eff…
+9:53:21 PM [express] GET /api/communication-patterns 304 in 0ms :: []
+9:53:21 PM [express] GET /api/metrics 304 in 0ms :: []
+9:53:21 PM [express] GET /api/breakthroughs 304 in 0ms :: []
+9:53:22 PM [express] GET /api/metrics 304 in 0ms :: []
+9:53:23 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:23 PM [express] GET /api/metrics 304 in 0ms :: []
+9:53:24 PM [express] GET /api/memory 304 in 1ms :: {"vectors":[],"usage":{"total":1000,"used":0,"eff…
+9:53:24 PM [express] GET /api/metrics 304 in 1ms :: []
+Client disconnected from WebSocket
+9:53:24 PM [express] GET /api/experiments 200 in 1ms :: [{"name":"Brain-Inspired MARL Training","des…
+Client connected to WebSocket
+9:53:26 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":null,"currentEpisode":0,"c…
+Client connected to WebSocket
+9:53:28 PM [express] GET /api/training/status 304 in 1ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:29 PM [express] GET /api/experiments 304 in 0ms :: [{"name":"Brain-Inspired MARL Training","des…
+9:53:30 PM [express] GET /api/training/status 304 in 1ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:32 PM [express] GET /api/training/status 304 in 1ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:34 PM [express] GET /api/experiments 304 in 1ms :: [{"name":"Brain-Inspired MARL Training","des…
+9:53:34 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:36 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:38 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:39 PM [express] GET /api/experiments 304 in 1ms :: [{"name":"Brain-Inspired MARL Training","des…
+9:53:40 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:42 PM [express] GET /api/training/status 304 in 1ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:44 PM [express] GET /api/experiments 304 in 1ms :: [{"name":"Brain-Inspired MARL Training","des…
+9:53:44 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:44 PM [express] POST /api/training/ray/start 200 in 7ms :: {"success":true,"message":"Ray train…
+9:53:44 PM [express] GET /api/experiments 200 in 1ms :: [{"name":"Brain-Inspired MARL Training","des…
+9:53:44 PM [express] GET /api/training/status 200 in 0ms :: {"experiment":{"name":"Test","descriptio…
+9:53:44 PM [express] GET /api/experiments 304 in 1ms :: [{"name":"Brain-Inspired MARL Training","des…
+9:53:44 PM [express] GET /api/training/status 304 in 1ms :: {"experiment":{"name":"Test","descriptio…
+9:53:44 PM [express] GET /api/metrics/experiment/54 200 in 1ms :: []
+9:53:45 PM [express] GET /api/metrics/experiment/54 304 in 0ms :: []
+9:53:46 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":{"name":"Test","descriptio…
+9:53:46 PM [express] GET /api/metrics/experiment/54 304 in 0ms :: []
+9:53:47 PM [express] GET /api/metrics/experiment/54 304 in 0ms :: []
+Ray Training stderr: Traceback (most recent call last):
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_fallback.py", line 26, in <module>
+
+Ray Training stderr:     from ray.rllib.algorithms.ppo import PPO, PPOConfig
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/__init__.py", line 7, in <module>
+    from ray.rllib.env.base_env import BaseEnv
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/env/__init__.py", line 1, in <module>
+    from ray.rllib.env.base_env import BaseEnv
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/env/base_env.py", line 6, in <module>
+    from ray.rllib.utils.annotations import Deprecated, DeveloperAPI, PublicAPI
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/utils/__init__.py", line 34, in <module>
+    from ray.rllib.utils.test_utils import (
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/utils/test_utils.py", line 30, in <module>
+    from ray import air, tune
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/air/__init__.py", line 1, in <module>
+    from ray.air.config import (
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/air/config.py", line 22, in <module>
+
+Ray Training stderr:     from ray.data.preprocessor import Preprocessor
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/data/__init__.py", line 79, in <module>
+
+Ray Training stderr:     pa.PyExtensionType.set_auto_load(True)
+    ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'pyarrow' has no attribute 'PyExtensionType'. Did you mean: 'ExtensionType'?
+
+Ray training process failed: Traceback (most recent call last):
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_fallback.py", line 26, in <module>
+    from ray.rllib.algorithms.ppo import PPO, PPOConfig
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/__init__.py", line 7, in <module>
+    from ray.rllib.env.base_env import BaseEnv
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/env/__init__.py", line 1, in <module>
+    from ray.rllib.env.base_env import BaseEnv
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/env/base_env.py", line 6, in <module>
+    from ray.rllib.utils.annotations import Deprecated, DeveloperAPI, PublicAPI
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/utils/__init__.py", line 34, in <module>
+    from ray.rllib.utils.test_utils import (
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/utils/test_utils.py", line 30, in <module>
+    from ray import air, tune
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/air/__init__.py", line 1, in <module>
+    from ray.air.config import (
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/air/config.py", line 22, in <module>
+    from ray.data.preprocessor import Preprocessor
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/data/__init__.py", line 79, in <module>
+    pa.PyExtensionType.set_auto_load(True)
+    ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'pyarrow' has no attribute 'PyExtensionType'. Did you mean: 'ExtensionType'?
+
+9:53:48 PM [express] GET /api/experiments 200 in 0ms :: [{"name":"Brain-Inspired MARL Training","des…
+9:53:48 PM [express] GET /api/training/status 200 in 0ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:48 PM [express] GET /api/metrics/experiment/54 304 in 0ms :: []
+9:53:49 PM [express] GET /api/metrics/experiment/54 304 in 0ms :: []
+9:53:50 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:50 PM [express] GET /api/metrics/experiment/54 304 in 1ms :: []
+9:53:51 PM [express] GET /api/metrics/experiment/54 304 in 0ms :: []
+9:53:52 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:52 PM [express] GET /api/metrics/experiment/54 304 in 0ms :: []
+9:53:53 PM [express] GET /api/experiments 304 in 1ms :: [{"name":"Brain-Inspired MARL Training","des…
+9:53:53 PM [express] GET /api/metrics/experiment/54 304 in 0ms :: []
+9:53:54 PM [express] GET /api/training/status 304 in 1ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:54 PM [express] GET /api/metrics/experiment/54 304 in 1ms :: []
+9:53:55 PM [express] GET /api/metrics/experiment/54 304 in 0ms :: []
+9:53:56 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":null,"currentEpisode":0,"c…
+9:53:56 PM [express] POST /api/training/ray/start 200 in 6ms :: {"success":true,"message":"Ray train…
+9:53:56 PM [express] GET /api/experiments 200 in 1ms :: [{"name":"Brain-Inspired MARL Training","des…
+9:53:56 PM [express] GET /api/training/status 200 in 0ms :: {"experiment":{"name":"Test","descriptio…
+9:53:56 PM [express] GET /api/experiments 304 in 1ms :: [{"name":"Brain-Inspired MARL Training","des…
+9:53:56 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":{"name":"Test","descriptio…
+9:53:56 PM [express] GET /api/metrics/experiment/55 200 in 0ms :: []
+9:53:57 PM [express] GET /api/metrics/experiment/55 304 in 1ms :: []
+Ray Training stderr: Traceback (most recent call last):
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_fallback.py", line 26, in <module>
+
+Ray Training stderr:     from ray.rllib.algorithms.ppo import PPO, PPOConfig
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/__init__.py", line 7, in <module>
+    from ray.rllib.env.base_env import BaseEnv
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/env/__init__.py", line 1, in <module>
+    from ray.rllib.env.base_env import BaseEnv
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/env/base_env.py", line 6, in <module>
+    from ray.rllib.utils.annotations import Deprecated, DeveloperAPI, PublicAPI
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/utils/__init__.py", line 34, in <module>
+    from ray.rllib.utils.test_utils import (
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/utils/test_utils.py", line 30, in <module>
+    from ray import air, tune
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/air/__init__.py", line 1, in <module>
+    from ray.air.config import (
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/air/config.py", line 22, in <module>
+    from ray.data.preprocessor import Preprocessor
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/data/__init__.py", line 79, in <module>
+    pa.PyExtensionType.set_auto_load(True)
+    ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'pyarrow' has no attribute 'PyExtensionType'. Did you mean: 'ExtensionType'?
+
+9:53:58 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":{"name":"Test","descriptio…
+9:53:58 PM [express] GET /api/metrics/experiment/55 304 in 0ms :: []
+Ray training process failed: Traceback (most recent call last):
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_fallback.py", line 26, in <module>
+    from ray.rllib.algorithms.ppo import PPO, PPOConfig
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/__init__.py", line 7, in <module>
+    from ray.rllib.env.base_env import BaseEnv
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/env/__init__.py", line 1, in <module>
+    from ray.rllib.env.base_env import BaseEnv
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/env/base_env.py", line 6, in <module>
+    from ray.rllib.utils.annotations import Deprecated, DeveloperAPI, PublicAPI
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/utils/__init__.py", line 34, in <module>
+    from ray.rllib.utils.test_utils import (
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/utils/test_utils.py", line 30, in <module>
+    from ray import air, tune
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/air/__init__.py", line 1, in <module>
+    from ray.air.config import (
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/air/config.py", line 22, in <module>
+    from ray.data.preprocessor import Preprocessor
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/data/__init__.py", line 79, in <module>
+    pa.PyExtensionType.set_auto_load(True)
+    ^^^^^^^^^^^^^^^^^^
+AttributeError: module 'pyarrow' has no attribute 'PyExtensionType'. Did you mean: 'ExtensionType'?

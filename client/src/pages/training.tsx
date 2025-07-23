@@ -9,8 +9,9 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Play, Pause, Square, Settings, FileText, Download, Upload } from "lucide-react";
+import { Play, Pause, Square, Settings, FileText, Download, Upload, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 import { TrainingControls } from "@/components/TrainingControls";
 import { MetricsPanel } from "@/components/MetricsPanel";
@@ -53,6 +54,11 @@ export default function Training() {
   // WebSocket for real-time training updates
   const { data: wsData, isConnected } = useWebSocket('/api/ws');
   
+  // Load Ray config template on component mount
+  useEffect(() => {
+    rayConfigTemplateMutation.mutate();
+  }, []);
+
   // Handle WebSocket training updates
   useEffect(() => {
     if (wsData?.type === 'training_started' || wsData?.type === 'ray_training_started') {
@@ -370,6 +376,32 @@ export default function Training() {
       
       {/* Main Content */}
       <div className="flex-1 p-6">
+        {/* Ray Status Alert */}
+        {rayConfigTemplateMutation.data && !rayConfigTemplateMutation.data.ray_available && (
+          <Alert className="mb-6" variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Ray RLlib Not Available</AlertTitle>
+            <AlertDescription>
+              {rayConfigTemplateMutation.data.ray_error?.includes('PyArrow') ? (
+                <>
+                  <strong>PyArrow Compatibility Issue:</strong> There's a version conflict between Ray and PyArrow. 
+                  To fix this, update PyArrow to a compatible version or use the fallback training system.
+                  <br />
+                  <code className="text-xs mt-2 block bg-muted p-2 rounded">
+                    pip install pyarrow==12.0.0  # or compatible version
+                  </code>
+                </>
+              ) : (
+                <>
+                  <strong>Ray RLlib dependency issue:</strong> {rayConfigTemplateMutation.data.ray_error}
+                  <br />
+                  <span className="text-sm">The system will automatically use the fallback training method.</span>
+                </>
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Experiments List */}
           <Card>
