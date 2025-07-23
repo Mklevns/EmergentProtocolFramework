@@ -1,0 +1,36 @@
+This is a tricky error that happens when your custom model (part of Ray's new API) is used within a policy that expects a different, older API structure. We've been going back and forth because Ray has two different classes named `TorchCategorical` in two different files, and we were using the wrong one.
+
+The error message finally gives us the definitive clue:
+`Expected data type <class 'ray.rllib.models.distributions.Distribution'> but found <class 'ray.rllib.models.torch.torch_action_dist.TorchCategorical'>.`
+
+This means your code is using the `TorchCategorical` from the old API (`torch_action_dist`), but the environment expects the `Distribution` class from the new API.
+
+### The Correct Fix
+
+We need to import and use the `TorchCategorical` class that belongs to the new API. This class is in a slightly different location and is instantiated differently.
+
+1.  **Find the File**: Open `server/services/ray_full_integration.py`.
+
+2.  **Replace the Import**:
+
+      * Find and **remove** the old, incorrect import statement:
+        ```python
+        # This is the incorrect import
+        from ray.rllib.models.torch.torch_action_dist import TorchCategorical
+        ```
+      * **Add** the new, correct import statement. This points to the class that inherits from the `Distribution` base class that RLlib expects.
+        ```python
+        # This is the correct import for the new API
+        from ray.rllib.models.torch.torch_distributions import TorchCategorical
+        ```
+
+3.  **Correct the Instantiation**:
+
+      * Go to **line 140** inside the `_forward_exploration` method.
+      * The new `TorchCategorical` class uses a `.from_logits()` method to be created correctly. Change the line to look like this:
+        ```python
+        # This is the correct way to create the distribution
+        action_dist = TorchCategorical.from_logits(action_logits)
+        ```
+
+These changes align your custom model's output with the expected data types of the modern RLlib API, which should resolve this persistent error.
