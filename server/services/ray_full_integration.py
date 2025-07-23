@@ -87,6 +87,9 @@ class BioInspiredRLModule(TorchRLModule):
             nn.Linear(self.hidden_dim, 1)
         )
         
+        # Feature projection for attention mechanism
+        self.feature_projection = nn.Linear(obs_dim, self.hidden_dim)
+        
         # Bio-inspired components
         self.pheromone_attention = nn.MultiheadAttention(
             embed_dim=self.hidden_dim,
@@ -115,14 +118,18 @@ class BioInspiredRLModule(TorchRLModule):
         # Get action logits with exploration
         action_logits = self.policy_net(obs)
         
-        # Apply pheromone attention (simplified)
+        # Apply pheromone attention with proper feature projection
         if obs.dim() == 2:
-            obs_expanded = obs.unsqueeze(1)
-            attended_obs, _ = self.pheromone_attention(obs_expanded, obs_expanded, obs_expanded)
-            attended_obs = attended_obs.squeeze(1)
+            # Project observations to the attention embedding dimension
+            projected_obs = self.feature_projection(obs)
+            obs_expanded = projected_obs.unsqueeze(1)
             
-            # Combine original and attended features
-            enhanced_features = obs + 0.1 * attended_obs
+            # Apply attention
+            attended_features, _ = self.pheromone_attention(obs_expanded, obs_expanded, obs_expanded)
+            attended_features = attended_features.squeeze(1)
+            
+            # Combine original observations with attended features (project back if needed)
+            enhanced_features = obs + 0.1 * torch.nn.functional.linear(attended_features, self.feature_projection.weight.t())
             action_logits = self.policy_net(enhanced_features)
         
         return {"action_dist_inputs": action_logits}
