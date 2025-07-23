@@ -1,0 +1,324 @@
+Ray Training stderr: 2025-07-22 22:51:40,878 - __main__ - INFO - ✅ Ray RLlib is available
+
+Ray Training stderr: 2025-07-22 22:51:41,158 - services.marl_framework - INFO - MARL Framework initialized
+
+Ray Training stderr: 2025-07-22 22:51:41,159 - services.ray_api_integration - INFO - Ray Training API initialized
+
+Ray Training stderr: 2025-07-22 22:51:41,159 - services.ray_api_integration - INFO - Ray Training API initialized
+
+Ray Training stderr: 2025-07-22 22:51:41,160 - services.ray_api_integration - INFO - Configuration validated for experiment: test
+2025-07-22 22:51:41,160 - services.ray_training_orchestrator - INFO - Ray Training Orchestrator initialized: test
+2025-07-22 22:51:41,160 - services.ray_training_orchestrator - INFO - Ray enabled: True
+2025-07-22 22:51:41,160 - services.ray_api_integration - INFO - Starting Ray training for experiment 1
+2025-07-22 22:51:41,160 - services.ray_training_orchestrator - INFO - Starting training with Ray integration: True
+2025-07-22 22:51:41,160 - services.ray_training_orchestrator - INFO - Initializing Ray integration...
+
+10:51:41 PM [express] GET /api/metrics/experiment/1 304 in 1ms :: []
+10:51:42 PM [express] GET /api/training/status 304 in 1ms :: {"experiment":{"name":"test","descriptio…
+10:51:42 PM [express] GET /api/metrics/experiment/1 304 in 1ms :: []
+Ray Training stderr: 2025-07-22 22:51:43,122    INFO worker.py:1724 -- Started a local Ray instance.
+
+Ray Training stderr: 2025-07-22 22:51:43,147    INFO packaging.py:530 -- Creating a file package for local directory '/home/micha/EmergentProtocolFramework/server'.
+
+Ray Training stderr: 2025-07-22 22:51:43,158    INFO packaging.py:358 -- Pushing file package 'gcs://_ray_pkg_4e2d435244db8867.zip' (1.03MiB) to Ray cluster...
+
+Ray Training stderr: 2025-07-22 22:51:43,166    INFO packaging.py:371 -- Successfully pushed file package 'gcs://_ray_pkg_4e2d435244db8867.zip'.
+
+10:51:43 PM [express] GET /api/experiments 304 in 1ms :: [{"name":"test","description":"Bio-inspired …
+10:51:43 PM [express] GET /api/metrics/experiment/1 304 in 0ms :: []
+Ray Training stderr: 2025-07-22 22:51:43,895 - services.ray_full_integration - INFO - Ray initialized successfully with runtime environment
+
+Ray Training stderr: /home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/algorithms/algorithm.py:483: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+`UnifiedLogger` will be removed in Ray 2.7.
+  return UnifiedLogger(config, logdir, loggers=None)
+
+Ray Training stderr: /home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `JsonLogger interface is deprecated in favor of the `ray.tune.json.JsonLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+
+Ray Training stderr: /home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `CSVLogger interface is deprecated in favor of the `ray.tune.csv.CSVLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/tune/logger/unified.py:53: RayDeprecationWarning: This API is deprecated and may be removed in future Ray releases. You could suppress this warning by setting env variable PYTHONWARNINGS="ignore::DeprecationWarning"
+The `TBXLogger interface is deprecated in favor of the `ray.tune.tensorboardx.TBXLoggerCallback` interface and will be removed in Ray 2.7.
+  self._loggers.append(cls(self.config, self.logdir, self.trial))
+
+10:51:44 PM [express] GET /api/training/status 304 in 0ms :: {"experiment":{"name":"test","descriptio…
+10:51:44 PM [express] GET /api/metrics/experiment/1 304 in 1ms :: []
+10:51:45 PM [express] GET /api/metrics/experiment/1 304 in 1ms :: []
+10:51:46 PM [express] GET /api/training/status 304 in 1ms :: {"experiment":{"name":"test","descriptio…
+10:51:46 PM [express] GET /api/metrics/experiment/1 304 in 0ms :: []
+10:51:47 PM [express] GET /api/metrics/experiment/1 304 in 1ms :: []
+Ray Training stderr: 2025-07-22 22:51:47,690    ERROR actor_manager.py:506 -- Ray error, taking actor 1 out of service. The actor died because of an error raised in its creation task, ray::RolloutWorker.__init__() (pid=39127, ip=172.23.15.241, actor_id=ccea3d5ffbbb4a200a9fe9bf01000000, repr=<ray.rllib.evaluation.rollout_worker.RolloutWorker object at 0x7d3b57f03ad0>)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 535, in __init__
+    self._update_policy_map(policy_dict=self.policy_dict)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 1746, in _update_policy_map
+    self._build_policy_map(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 1857, in _build_policy_map
+    new_policy = create_policy_for_framework(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/utils/policy.py", line 141, in create_policy_for_framework
+    return policy_class(observation_space, action_space, merged_config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/algorithms/ppo/ppo_torch_policy.py", line 49, in __init__
+    TorchPolicyV2.__init__(
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/policy/torch_policy_v2.py", line 92, in __init__
+    model = self.make_rl_module()
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/policy/policy.py", line 432, in make_rl_module
+    marl_module = marl_spec.build()
+                  ^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/marl_module.py", line 491, in build
+    module = self.marl_module_class(module_config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 377, in new_init
+    previous_init(self, *args, **kwargs)
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/marl_module.py", line 70, in __init__
+    super().__init__(config or MultiAgentRLModuleConfig())
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 369, in __init__
+    self.setup()
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/marl_module.py", line 77, in setup
+    self._rl_modules[module_id] = module_spec.build()
+                                  ^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 104, in build
+    module = self.module_class(module_config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 377, in new_init
+    previous_init(self, *args, **kwargs)
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_full_integration.py", line 62, in __init__
+    self.hidden_dim = config.get("hidden_dim", 256)
+                      ^^^^^^^^^^
+AttributeError: 'RLModuleConfig' object has no attribute 'get'
+
+Ray Training stderr: 2025-07-22 22:51:47,690    ERROR actor_manager.py:506 -- Ray error, taking actor 2 out of service. The actor died because of an error raised in its creation task, ray::RolloutWorker.__init__() (pid=39128, ip=172.23.15.241, actor_id=dc9d8a5293650cb4365826fd01000000, repr=<ray.rllib.evaluation.rollout_worker.RolloutWorker object at 0x703c4270bf10>)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 535, in __init__
+    self._update_policy_map(policy_dict=self.policy_dict)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 1746, in _update_policy_map
+    self._build_policy_map(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 1857, in _build_policy_map
+    new_policy = create_policy_for_framework(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/utils/policy.py", line 141, in create_policy_for_framework
+    return policy_class(observation_space, action_space, merged_config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/algorithms/ppo/ppo_torch_policy.py", line 49, in __init__
+    TorchPolicyV2.__init__(
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/policy/torch_policy_v2.py", line 92, in __init__
+    model = self.make_rl_module()
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/policy/policy.py", line 432, in make_rl_module
+    marl_module = marl_spec.build()
+                  ^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/marl_module.py", line 491, in build
+    module = self.marl_module_class(module_config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 377, in new_init
+    previous_init(self, *args, **kwargs)
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/marl_module.py", line 70, in __init__
+    super().__init__(config or MultiAgentRLModuleConfig())
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 369, in __init__
+    self.setup()
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/marl_module.py", line 77, in setup
+    self._rl_modules[module_id] = module_spec.build()
+                                  ^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 104, in build
+    module = self.module_class(module_config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 377, in new_init
+    previous_init(self, *args, **kwargs)
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_full_integration.py", line 62, in __init__
+    self.hidden_dim = config.get("hidden_dim", 256)
+                      ^^^^^^^^^^
+AttributeError: 'RLModuleConfig' object has no attribute 'get'
+2025-07-22 22:51:47,690 ERROR actor_manager.py:506 -- Ray error, taking actor 3 out of service. The actor died because of an error raised in its creation task, ray::RolloutWorker.__init__() (pid=39129, ip=172.23.15.241, actor_id=defa2d28a491f9606478f45101000000, repr=<ray.rllib.evaluation.rollout_worker.RolloutWorker object at 0x7e6e6c7d3c50>)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 535, in __init__
+    self._update_policy_map(policy_dict=self.policy_dict)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 1746, in _update_policy_map
+    self._build_policy_map(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 1857, in _build_policy_map
+    new_policy = create_policy_for_framework(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/utils/policy.py", line 141, in create_policy_for_framework
+    return policy_class(observation_space, action_space, merged_config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/algorithms/ppo/ppo_torch_policy.py", line 49, in __init__
+    TorchPolicyV2.__init__(
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/policy/torch_policy_v2.py", line 92, in __init__
+    model = self.make_rl_module()
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/policy/policy.py", line 432, in make_rl_module
+    marl_module = marl_spec.build()
+                  ^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/marl_module.py", line 491, in build
+    module = self.marl_module_class(module_config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 377, in new_init
+    previous_init(self, *args, **kwargs)
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/marl_module.py", line 70, in __init__
+    super().__init__(config or MultiAgentRLModuleConfig())
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 369, in __init__
+    self.setup()
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/marl_module.py", line 77, in setup
+    self._rl_modules[module_id] = module_spec.build()
+                                  ^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 104, in build
+    module = self.module_class(module_config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 377, in new_init
+    previous_init(self, *args, **kwargs)
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_full_integration.py", line 62, in __init__
+    self.hidden_dim = config.get("hidden_dim", 256)
+                      ^^^^^^^^^^
+AttributeError: 'RLModuleConfig' object has no attribute 'get'
+2025-07-22 22:51:47,691 ERROR actor_manager.py:506 -- Ray error, taking actor 4 out of service. The actor died because of an error raised in its creation task, ray::RolloutWorker.__init__() (pid=39130, ip=172.23.15.241, actor_id=e8c8a208b4aaf306898c6f7a01000000, repr=<ray.rllib.evaluation.rollout_worker.RolloutWorker object at 0x745bff44ff90>)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 535, in __init__
+    self._update_policy_map(policy_dict=self.policy_dict)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 1746, in _update_policy_map
+    self._build_policy_map(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 1857, in _build_policy_map
+    new_policy = create_policy_for_framework(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/utils/policy.py", line 141, in create_policy_for_framework
+    return policy_class(observation_space, action_space, merged_config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/algorithms/ppo/ppo_torch_policy.py", line 49, in __init__
+    TorchPolicyV2.__init__(
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/policy/torch_policy_v2.py", line 92, in __init__
+    model = self.make_rl_module()
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/policy/policy.py", line 432, in make_rl_module
+    marl_module = marl_spec.build()
+                  ^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/marl_module.py", line 491, in build
+    module = self.marl_module_class(module_config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 377, in new_init
+    previous_init(self, *args, **kwargs)
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/marl_module.py", line 70, in __init__
+    super().__init__(config or MultiAgentRLModuleConfig())
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 369, in __init__
+    self.setup()
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/marl_module.py", line 77, in setup
+    self._rl_modules[module_id] = module_spec.build()
+                                  ^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 104, in build
+    module = self.module_class(module_config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 377, in new_init
+    previous_init(self, *args, **kwargs)
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_full_integration.py", line 62, in __init__
+    self.hidden_dim = config.get("hidden_dim", 256)
+                      ^^^^^^^^^^
+AttributeError: 'RLModuleConfig' object has no attribute 'get'
+2025-07-22 22:51:47,691 - services.ray_training_orchestrator - ERROR - Training failed: 'RLModuleConfig' object has no attribute 'get'
+2025-07-22 22:51:47,691 - services.ray_api_integration - ERROR - Ray training failed: 'RLModuleConfig' object has no attribute 'get'
+
+Ray Training stdout: {"type": "ray_training_metrics", "experiment_id": 1, "timestamp": 1753249907.6912208, "training_method": "ray_rllib", "success": false, "error": "'RLModuleConfig' object has no attribute 'get'"}
+
+Ray Training stderr: 2025-07-22 22:51:47,698 - services.ray_api_integration - ERROR - Traceback (most recent call last):
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/worker_set.py", line 159, in __init__
+    self._setup(
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/worker_set.py", line 229, in _setup
+    self.add_workers(
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/worker_set.py", line 616, in add_workers
+    raise result.get()
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/utils/actor_manager.py", line 487, in __fetch_result
+    result = ray.get(r)
+             ^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/_private/auto_init_hook.py", line 22, in auto_init_wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/_private/worker.py", line 2626, in get
+    raise value
+ray.exceptions.RayActorError: The actor died because of an error raised in its creation task, ray::RolloutWorker.__init__() (pid=39127, ip=172.23.15.241, actor_id=ccea3d5ffbbb4a200a9fe9bf01000000, repr=<ray.rllib.evaluation.rollout_worker.RolloutWorker object at 0x7d3b57f03ad0>)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 535, in __init__
+    self._update_policy_map(policy_dict=self.policy_dict)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 1746, in _update_policy_map
+    self._build_policy_map(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/rollout_worker.py", line 1857, in _build_policy_map
+    new_policy = create_policy_for_framework(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/utils/policy.py", line 141, in create_policy_for_framework
+    return policy_class(observation_space, action_space, merged_config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/algorithms/ppo/ppo_torch_policy.py", line 49, in __init__
+    TorchPolicyV2.__init__(
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/policy/torch_policy_v2.py", line 92, in __init__
+    model = self.make_rl_module()
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/policy/policy.py", line 432, in make_rl_module
+    marl_module = marl_spec.build()
+                  ^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/marl_module.py", line 491, in build
+    module = self.marl_module_class(module_config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 377, in new_init
+    previous_init(self, *args, **kwargs)
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/marl_module.py", line 70, in __init__
+    super().__init__(config or MultiAgentRLModuleConfig())
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 369, in __init__
+    self.setup()
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/marl_module.py", line 77, in setup
+    self._rl_modules[module_id] = module_spec.build()
+                                  ^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 104, in build
+    module = self.module_class(module_config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/core/rl_module/rl_module.py", line 377, in new_init
+    previous_init(self, *args, **kwargs)
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_full_integration.py", line 62, in __init__
+    self.hidden_dim = config.get("hidden_dim", 256)
+                      ^^^^^^^^^^
+AttributeError: 'RLModuleConfig' object has no attribute 'get'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_api_integration.py", line 62, in start_ray_training
+    result = await self.current_orchestrator.train()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_training_orchestrator.py", line 114, in train
+    return await self._train_with_ray()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_training_orchestrator.py", line 141, in _train_with_ray
+    algorithm = self.ray_integration.create_algorithm()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/server/services/ray_full_integration.py", line 619, in create_algorithm
+    self.algorithm = config.build()
+                     ^^^^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/algorithms/algorithm_config.py", line 1137, in build
+    return algo_class(
+           ^^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/algorithms/algorithm.py", line 516, in __init__
+    super().__init__(
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/tune/trainable/trainable.py", line 161, in __init__
+    self.setup(copy.deepcopy(self.config))
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/algorithms/algorithm.py", line 638, in setup
+    self.workers = WorkerSet(
+                   ^^^^^^^^^^
+  File "/home/micha/EmergentProtocolFramework/.venv/lib/python3.11/site-packages/ray/rllib/evaluation/worker_set.py", line 181, in __init__
+    raise e.args[0].args[2]
+AttributeError: 'RLModuleConfig' object has no attribute 'get'
