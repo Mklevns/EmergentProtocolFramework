@@ -12,7 +12,7 @@ from typing import Dict, Any, Optional, List, Tuple
 import gymnasium as gym
 from gymnasium.spaces import Box, Discrete, Dict as DictSpace
 import logging
-from dataclasses import dataclass
+from dataclasses importdataclass
 from pathlib import Path
 import json
 import time
@@ -30,6 +30,7 @@ from ray.rllib.env.multi_agent_env import MultiAgentEnv
 from ray.rllib.env.env_context import EnvContext
 from ray.tune.registry import register_env
 from ray.rllib.models.torch.torch_action_dist import TorchCategorical
+from torch.distributions import Categorical as TorchCategoricalDist
 
 # Bio-inspired components
 import sys
@@ -110,7 +111,7 @@ class BioInspiredRLModule(TorchRLModule):
         action_logits = self.policy_net(obs)
 
         # Create RLlib categorical distribution from logits
-        action_dist = TorchCategorical(action_logits)
+        action_dist = TorchCategorical.from_logits(action_logits)
 
         return {"action_dist": action_dist}
 
@@ -137,7 +138,7 @@ class BioInspiredRLModule(TorchRLModule):
             action_logits = self.policy_net(enhanced_features)
 
         # Create RLlib categorical distribution from logits
-        action_dist = TorchCategorical(action_logits)
+        action_dist = TorchCategorical.from_logits(action_logits)
 
         return {"action_dist": action_dist}
 
@@ -155,7 +156,7 @@ class BioInspiredRLModule(TorchRLModule):
         action_logits = action_logits * (1.0 + plasticity_factor * self.neural_plasticity_rate)
 
         # Create RLlib categorical distribution from logits
-        action_dist = TorchCategorical(action_logits)
+        action_dist = TorchCategorical.from_logits(action_logits)
 
         return {
             "action_dist": action_dist,
