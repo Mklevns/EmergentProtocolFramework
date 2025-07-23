@@ -109,8 +109,8 @@ class BioInspiredRLModule(TorchRLModule):
         # Get action logits
         action_logits = self.policy_net(obs)
 
-        # Create RLlib categorical distribution from logits using the correct method
-        action_dist = TorchCategorical.from_logits(action_logits)
+        # Create RLlib categorical distribution from logits
+        action_dist = TorchCategorical(action_logits)
 
         return {"action_dist": action_dist}
 
@@ -136,8 +136,8 @@ class BioInspiredRLModule(TorchRLModule):
             enhanced_features = obs + 0.1 * torch.nn.functional.linear(attended_features, self.feature_projection.weight.t())
             action_logits = self.policy_net(enhanced_features)
 
-        # Create RLlib categorical distribution from logits using the correct method
-        action_dist = TorchCategorical.from_logits(action_logits)
+        # Create RLlib categorical distribution from logits
+        action_dist = TorchCategorical(action_logits)
 
         return {"action_dist": action_dist}
 
@@ -154,8 +154,8 @@ class BioInspiredRLModule(TorchRLModule):
         plasticity_factor = torch.sigmoid(self.plasticity_weights).mean()
         action_logits = action_logits * (1.0 + plasticity_factor * self.neural_plasticity_rate)
 
-        # Create RLlib categorical distribution from logits using the correct method
-        action_dist = TorchCategorical.from_logits(action_logits)
+        # Create RLlib categorical distribution from logits
+        action_dist = TorchCategorical(action_logits)
 
         return {
             "action_dist": action_dist,
