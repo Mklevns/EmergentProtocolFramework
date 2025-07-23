@@ -1,0 +1,48 @@
+The Problem: Circular Import
+The error message tells us everything we need to know:
+cannot import name 'Message' from partially initialized module 'services.communication_protocol' (most likely due to a circular import)
+
+This happens when two or more Python files try to import each other.
+
+Imagine this scenario:
+
+file_A.py needs a class from file_B.py, so it starts with from file_B import SomeClass.
+
+Python starts loading file_A.py. When it gets to the import line, it pauses and goes to load file_B.py.
+
+However, file_B.py needs a class from file_A.py, so it has a line that says from file_A import AnotherClass.
+
+Python is now stuck. It can't finish loading file_A because it needs file_B, and it can't finish loading file_B because it needs file_A. This loop is a "circular import."
+
+In your case, communication_protocol.py is part of this loop. It's trying to import something, but another file that it depends on is also trying to import the Message class from communication_protocol.py before it has been fully loaded.
+
+How to Fix It
+The standard solution is to move the shared, core definitions into a new, independent file that doesn't import anything else from your project.
+
+Create a New File:
+In your server/services/ directory, create a new, blank file. A good name would be communication_types.py or shared_models.py.
+
+Move the Message Class:
+
+Open server/services/communication_protocol.py.
+
+Find the Message class definition (e.g., class Message:...).
+
+Cut the entire class definition from this file and paste it into your new file (communication_types.py).
+
+Update Your Imports:
+Now, go into the files that have the circular dependency and update them to import Message from its new location.
+
+In server/services/communication_protocol.py, change the import to:
+
+Python
+
+# from .some_other_file import ...  <- (This line might not exist, it's an example)
+from .communication_types import Message #  <-- Add or update this line
+Find the other file(s) that use Message and also update their import statements to point to the new file:
+
+Python
+
+# from .communication_protocol import Message  <-- This is the old, broken import
+from .communication_types import Message       #  <-- This is the new, correct import
+By moving the Message class to a neutral file that doesn't import other project files, you break the circle and resolve the error.
