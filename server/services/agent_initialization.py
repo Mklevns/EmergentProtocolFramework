@@ -11,7 +11,14 @@ from typing import Dict, List, Tuple, Any
 from dataclasses import dataclass, asdict
 from enum import Enum
 
-from .communication_types import Position3D
+try:
+    from .communication_types import Position3D
+except ImportError:
+    # If relative import fails (when run as main), try absolute import
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    from communication_types import Position3D
 
 class AgentType(Enum):
     REGULAR = "regular"

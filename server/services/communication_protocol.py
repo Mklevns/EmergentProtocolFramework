@@ -17,7 +17,14 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 
 # Import shared types to avoid circular imports
-from .communication_types import Message, MessageType, Agent, Position3D
+try:
+    from .communication_types import Message, MessageType, Agent, Position3D
+except ImportError:
+    # If relative import fails (when run as main), try absolute import
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    from communication_types import Message, MessageType, Agent, Position3D
 
 logger = logging.getLogger(__name__)
 

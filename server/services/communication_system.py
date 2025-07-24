@@ -11,14 +11,28 @@ from typing import Dict, List, Tuple, Any, Optional
 from dataclasses import asdict
 import time
 
-from .communication_types import (
-    MessageType,
-    CommunicationPattern, 
-    Position3D,
-    Agent,
-    Message,
-    CommunicationMetrics
-)
+try:
+    from .communication_types import (
+        MessageType,
+        CommunicationPattern, 
+        Position3D,
+        Agent,
+        Message,
+        CommunicationMetrics
+    )
+except ImportError:
+    # If relative import fails (when run as main), try absolute import
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    from communication_types import (
+        MessageType,
+        CommunicationPattern, 
+        Position3D,
+        Agent,
+        Message,
+        CommunicationMetrics
+    )
 
 class CommunicationSystem:
     def __init__(self):
